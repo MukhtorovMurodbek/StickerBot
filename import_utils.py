@@ -118,4 +118,4 @@ def parse_whatsapp_zip(raw: bytes, lang: str = "en") -> list[tuple[bytes, list[s
     zf.close()
     if not results:
         raise ImportError_(i18n.t(lang, "import_zip_no_images"))
-    return results
+    return results

@@ -269,6 +269,11 @@ STRINGS = {
             "so check the pack before retrying to avoid a duplicate. You can try "
             "again, or /cancel to stop."
         ),
+        "restarting_send_again": "🔄 I'm being updated right now — give me a few seconds and send that again.",
+        "update_soon_try_later": "🔧 I'm being updated in a moment, so I can't start anything new right now — please try again in about {minutes} minute(s). I'll message you when I'm back.",
+        "update_soon_try_later_soon": "🔧 I'm being updated right now, so I can't start anything new — please try again shortly. I'll message you when I'm back.",
+        "update_will_reset": "🔧 Heads up: I'm about to be updated, and what you have going right now will be reset. You'll be able to start it again in a few minutes.",
+        "update_done_try_now": '✅ The update is done — go ahead and try again now.',
         "video_convert_ffmpeg_missing": (
             "ffmpeg isn't installed on this host, so GIF/video stickers can't "
             "be converted. Install it with 'apt install ffmpeg' (Linux), "
@@ -536,6 +541,11 @@ STRINGS = {
             "shuning uchun qayta urinishdan oldin to'plamni tekshiring. Qayta urinib "
             "ko'rishingiz mumkin, yoki to'xtatish uchun /cancel qiling."
         ),
+        "restarting_send_again": "🔄 Hozir yangilanmoqdaman — bir necha soniyadan so'ng buni qaytadan yuboring.",
+        "update_soon_try_later": "🔧 Hozir yangilanaman, shuning uchun yangi ish boshlay olmayman — taxminan {minutes} daqiqadan so'ng qaytadan urinib ko'ring. Qaytganimda o'zim xabar beraman.",
+        "update_soon_try_later_soon": "🔧 Hozir yangilanmoqdaman, shuning uchun yangi ish boshlay olmayman — birozdan so'ng qaytadan urinib ko'ring. Qaytganimda o'zim xabar beraman.",
+        "update_will_reset": "🔧 Diqqat: men yangilanmoqchiman va hozir boshlagan ishingiz bekor qilinadi. Bir necha daqiqadan so'ng qaytadan boshlashingiz mumkin.",
+        "update_done_try_now": "✅ Yangilanish tugadi — endi qaytadan urinib ko'rishingiz mumkin.",
         "video_convert_ffmpeg_missing": (
             "Bu serverda ffmpeg o'rnatilmagan, shuning uchun GIF/video stikerlarni "
             "aylantirib bo'lmaydi. Uni 'apt install ffmpeg' (Linux), 'brew install "
@@ -799,6 +809,11 @@ STRINGS = {
             "проверьте набор перед повторной попыткой, чтобы не задвоить. Можете "
             "попробовать снова, или /cancel, чтобы остановиться."
         ),
+        "restarting_send_again": "🔄 Сейчас обновляюсь — подождите несколько секунд и отправьте ещё раз.",
+        "update_soon_try_later": '🔧 Сейчас меня обновляют, поэтому я не могу начать ничего нового — попробуйте снова примерно через {minutes} мин. Я напишу, когда вернусь.',
+        "update_soon_try_later_soon": '🔧 Сейчас меня обновляют, поэтому я не могу начать ничего нового — попробуйте снова чуть позже. Я напишу, когда вернусь.',
+        "update_will_reset": '🔧 Внимание: меня скоро обновят, и то, что вы сейчас начали, будет сброшено. Через несколько минут сможете начать заново.',
+        "update_done_try_now": '✅ Обновление завершено — можете пробовать снова.',
         "video_convert_ffmpeg_missing": (
             "На этом сервере не установлен ffmpeg, поэтому GIF/видео-стикеры нельзя "
             "преобразовать. Установите его через 'apt install ffmpeg' (Linux), "

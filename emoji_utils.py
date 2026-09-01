@@ -40,4 +40,4 @@ def split_emoji(text: str) -> list[str]:
         if e not in seen:
             seen.add(e)
             deduped.append(e)
-    return deduped[:MAX_EMOJI_PER_STICKER] or [DEFAULT_EMOJI]
+    return deduped[:MAX_EMOJI_PER_STICKER] or [DEFAULT_EMOJI]

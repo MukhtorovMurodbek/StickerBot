@@ -74,6 +74,9 @@ from telegram.ext import (
 
 import family_link
 import i18n
+import lifecycle
+import live_message
+from live_message import LiveMessage, edit_in_place
 from db import (
     init_db,
     add_pack,
@@ -105,6 +108,7 @@ from import_utils import (
 )
 from shared_features import (
     attach_maintenance,
+    refuse_new_work,
     CANCEL_PICK_ALL,
     CANCEL_PICK_NONE,
     CancelItem,
@@ -182,6 +186,7 @@ def build_start_text(lang: str) -> str:
 # (self-explanatory by script/language, since Telegram's command menu itself
 # isn't per-user).
 BOT_COMMANDS = [
+    BotCommand("start", "Start here / see the instructions"),
     BotCommand("newpack", "Start a new sticker pack"),
     BotCommand("addsticker", "Add stickers to an existing pack"),
     BotCommand("mypacks", "List your packs"),
@@ -199,16 +204,16 @@ BOT_COMMANDS = [
 
 # ---------- small helpers ----------
 
-async def reply(update: Update, text: str, **kwargs):
+async def reply(update: Update, text: str, **kwargs) -> LiveMessage:
     """Works whether the update came from a command or a button tap. A
-    button tap edits the tapped message in place instead of sending a new
+    button tap evolves the tapped message in place instead of sending a new
     one -- so menu navigation (start -> my packs -> a pack -> ...) reuses a
-    single evolving message, fstik/BotFather-style, rather than piling up a
-    fresh message per tap. A command has no prior bot message to edit, so
-    it always sends fresh."""
+    single message, fstik/BotFather-style, rather than piling up a fresh one
+    per tap. A command has no prior bot message to reuse, so it always sends
+    fresh."""
     if update.message:
-        return await update.message.reply_text(text, **kwargs)
-    return await update.callback_query.message.edit_text(text, **kwargs)
+        return await LiveMessage.reply_to(update.message, text, **kwargs)
+    return await edit_in_place(update.callback_query.message, update.get_bot(), text, **kwargs)
 
 
 def slugify(text: str) -> str:
@@ -303,58 +308,66 @@ def _status_text(context: ContextTypes.DEFAULT_TYPE, lang: str, note: str = "") 
     return text
 
 
+# The one message that tracks an editing session. It is the *only* thing
+# this bot says while a pack is open: every "added ✅", every failure, every
+# count is folded into it as the note line, rather than sent as a reply
+# underneath. That is not tidiness for its own sake -- a message that keeps
+# rewriting itself only works while it is the newest thing on screen, and a
+# separate confirmation after each sticker would push it out of that place
+# itself, every single time.
+#
+# When the user does speak over it -- another photo, a stray "ok" -- the
+# handle notices and moves the whole status down to the bottom as a new
+# message instead of rewriting one they have scrolled past. See
+# live_message.py.
+STATUS_KEY = "status"
+
+
+def _has_status(context: ContextTypes.DEFAULT_TYPE) -> bool:
+    return bool(context.user_data.get(STATUS_KEY))
+
+
 async def _start_status(
     context: ContextTypes.DEFAULT_TYPE, chat_id: int, title: str, lang: str,
-    intro: str = "", edit_message_id: int | None = None,
+    intro: str = "", adopt: dict | None = None,
 ):
-    """Sets up the one message that tracks this editing session, and keeps
-    getting edited in place (see _refresh_status/_end_status) as stickers
-    are added -- no separate "now send stuff" message, and no pinning:
-    editing the *same* message like fstik/BotFather do is what keeps it
-    findable, a pin isn't needed for that.
+    """Sets up the session's status message.
 
-    When edit_message_id is given, that existing bot message (typically the
-    prompt that led here) is turned into the status message instead of
-    sending a new one -- e.g. "What should the pack title be?" becomes
-    "📝 Creating "X" -- 0 sticker(s)..." in place.
+    When `adopt` is a saved handle (typically the prompt that led here), that
+    message becomes the status display instead of a new one being sent -- so
+    "What should the pack title be?" turns into "📝 Creating "X" -- 0
+    sticker(s)..." in place.
     """
     context.user_data["title"] = title
     context.user_data["sticker_count"] = 0
     context.user_data["status_intro"] = intro
     text = _status_text(context, lang)
     try:
-        if edit_message_id:
-            await context.bot.edit_message_text(chat_id=chat_id, message_id=edit_message_id, text=text)
-            msg_id = edit_message_id
+        live = LiveMessage.restore(adopt)
+        if live is None:
+            live = await LiveMessage.send(context.bot, chat_id, text)
         else:
-            sent = await context.bot.send_message(chat_id, text)
-            msg_id = sent.message_id
-        context.user_data["status_chat_id"] = chat_id
-        context.user_data["status_msg_id"] = msg_id
+            await live.set(context.bot, text)
+        context.user_data[STATUS_KEY] = live.save()
     except Exception:
         logger.exception("Couldn't set up the status message")
 
 
 async def _refresh_status(context: ContextTypes.DEFAULT_TYPE, lang: str, note: str = ""):
-    chat_id = context.user_data.get("status_chat_id")
-    msg_id = context.user_data.get("status_msg_id")
-    if not chat_id or not msg_id:
+    live = LiveMessage.restore(context.user_data.get(STATUS_KEY))
+    if live is None:
         return
-    try:
-        await context.bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text=_status_text(context, lang, note))
-    except Exception:
-        pass  # e.g. "message not modified" if the text is unchanged -- harmless
+    await live.set(context.bot, _status_text(context, lang, note))
+    # Saved back because set() may have moved it: a status the user talked
+    # over is re-sent at the bottom, under a new message id.
+    context.user_data[STATUS_KEY] = live.save()
 
 
 async def _end_status(context: ContextTypes.DEFAULT_TYPE, final_note: str):
-    chat_id = context.user_data.get("status_chat_id")
-    msg_id = context.user_data.get("status_msg_id")
-    if chat_id and msg_id:
-        try:
-            await context.bot.edit_message_text(chat_id=chat_id, message_id=msg_id, text=final_note)
-        except Exception:
-            pass
-    for key in ("status_chat_id", "status_msg_id", "sticker_count", "status_intro"):
+    live = LiveMessage.restore(context.user_data.get(STATUS_KEY))
+    if live is not None:
+        await live.finish(context.bot, final_note)
+    for key in (STATUS_KEY, "sticker_count", "status_intro"):
         context.user_data.pop(key, None)
 
 
@@ -471,7 +484,7 @@ async def dbdump_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         data = await asyncio.to_thread(dump_database_csv_zip)
     except Exception as exc:
-        await status.edit_text(f"⚠️ Export failed: {exc}")
+        await edit_in_place(status, context.bot, f"⚠️ Export failed: {exc}")
         return
     stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d_%H%M")
     await update.message.reply_document(
@@ -544,7 +557,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # below, not after it: a user who never picked a language is served in
     # English (i18n.get_lang) rather than turned away, so they can be in the
     # middle of a pack when this arrives.
-    if context.user_data.get("status_chat_id"):
+    if _has_status(context):
         await _end_status(context, i18n.t(lang or "en", "cancelled_status_note"))
     context.user_data.clear()
 
@@ -609,7 +622,7 @@ async def _apply_language(update: Update, context: ContextTypes.DEFAULT_TYPE, la
     """
     await asyncio.to_thread(set_user_language, update.effective_user.id, lang)
     pending = context.user_data.get("pending_start_args") or []
-    if context.user_data.get("status_chat_id"):
+    if _has_status(context):
         await _end_status(context, i18n.t(lang, "cancelled_status_note"))
     context.user_data.clear()
     context.user_data["lang"] = lang
@@ -651,7 +664,7 @@ async def menu_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     instead of leaving a trail of old menu messages behind."""
     lang = await i18n.get_lang(update.effective_user.id, context)
     await update.callback_query.answer()
-    await update.callback_query.message.edit_text(build_start_text(lang), reply_markup=start_menu_keyboard(lang))
+    await edit_in_place(update.callback_query.message, context.bot, build_start_text(lang), reply_markup=start_menu_keyboard(lang))
 
 
 async def start_coedit_link(update: Update, context: ContextTypes.DEFAULT_TYPE, token: str, lang: str):
@@ -693,7 +706,7 @@ async def menu_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     lang = await i18n.get_lang(update.effective_user.id, context)
     await update.callback_query.answer()
     kb = InlineKeyboardMarkup([[InlineKeyboardButton(i18n.t(lang, "btn_back"), callback_data="menu_start")]])
-    await update.callback_query.message.edit_text(build_help_text(lang), reply_markup=kb)
+    await edit_in_place(update.callback_query.message, context.bot, build_help_text(lang), reply_markup=kb)
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -741,14 +754,14 @@ async def pack_detail(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
 
     title = await asyncio.to_thread(get_pack_title, pack_name) or pack_name
-    await query.message.edit_text(
+    await edit_in_place(query.message, context.bot, 
         i18n.t(lang, "pack_detail_title", title=title), reply_markup=pack_detail_keyboard(pack_name, lang)
     )
 
 
 # ---------- co-editing menu ----------
 
-async def _send_coedit_message(message, pack_name: str, lang: str):
+async def _send_coedit_message(message, bot, pack_name: str, lang: str):
     # One trip to the database for all three values -- this used to be a
     # token read, a title read and an editor count, each with its own
     # round trip, to render a single message.
@@ -767,7 +780,7 @@ async def _send_coedit_message(message, pack_name: str, lang: str):
             [InlineKeyboardButton(i18n.t(lang, "btn_back"), callback_data=f"packopen:{pack_name}")],
         ]
     )
-    await message.edit_text(text, reply_markup=kb)
+    await edit_in_place(message, bot, text, reply_markup=kb)
 
 
 async def coedit_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -780,7 +793,7 @@ async def coedit_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.answer(i18n.t(lang, "only_owner_coedit"), show_alert=True)
         return
     await query.answer()
-    await _send_coedit_message(query.message, pack_name, lang)
+    await _send_coedit_message(query.message, context.bot, pack_name, lang)
 
 
 async def coedit_reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -795,7 +808,7 @@ async def coedit_reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await asyncio.to_thread(reset_share_token, pack_name)
     await query.answer(i18n.t(lang, "link_reset_confirm"))
-    await _send_coedit_message(query.message, pack_name, lang)
+    await _send_coedit_message(query.message, context.bot, pack_name, lang)
 
 
 # ---------- rename ----------
@@ -814,25 +827,26 @@ async def rename_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data.clear()
     context.user_data["lang"] = lang
     context.user_data["rename_pack"] = pack_name
-    # The actual new title arrives as a plain text message, not a button
-    # tap -- stashing this prompt's own id/chat lets receive_new_title edit
-    # it into the result below instead of sending a separate reply.
-    context.user_data["rename_chat_id"] = query.message.chat_id
-    context.user_data["rename_msg_id"] = query.message.message_id
-    await query.message.edit_text(
+    # The new title arrives as a plain text message, not a button tap --
+    # stashing this prompt's handle lets receive_new_title turn it into the
+    # result instead of sending a separate reply. By then the user's own
+    # title message is underneath it, so the handle will (correctly) send a
+    # new message rather than rewrite one they have already scrolled past.
+    prompt = await edit_in_place(
+        query.message, context.bot,
         i18n.t(lang, "rename_prompt",
-               title=await asyncio.to_thread(get_pack_title, pack_name) or pack_name)
+               title=await asyncio.to_thread(get_pack_title, pack_name) or pack_name),
     )
+    context.user_data["rename_prompt"] = prompt.save()
     return RENAME
 
 
 async def receive_new_title(update: Update, context: ContextTypes.DEFAULT_TYPE):
     lang = await i18n.get_lang(update.effective_user.id, context)
     pack_name = context.user_data.get("rename_pack")
-    chat_id = context.user_data.get("rename_chat_id")
-    msg_id = context.user_data.get("rename_msg_id")
+    prompt = LiveMessage.restore(context.user_data.get("rename_prompt"))
     new_title = update.message.text.strip()[:64]  # Telegram title limit
-    if not pack_name or not chat_id or not msg_id:
+    if not pack_name or prompt is None:
         await update.message.reply_text(i18n.t(lang, "rename_broken_state"))
         return ConversationHandler.END
 
@@ -840,14 +854,10 @@ async def receive_new_title(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         await context.bot.set_sticker_set_title(name=pack_name, title=new_title)
         await asyncio.to_thread(set_pack_title, pack_name, new_title)
-        await context.bot.edit_message_text(
-            chat_id=chat_id, message_id=msg_id, text=i18n.t(lang, "renamed_success", title=new_title), reply_markup=kb,
-        )
+        await prompt.finish(context.bot, i18n.t(lang, "renamed_success", title=new_title), reply_markup=kb)
     except Exception as exc:
         logger.exception("Rename failed")
-        await context.bot.edit_message_text(
-            chat_id=chat_id, message_id=msg_id, text=i18n.t(lang, "renamed_failed", error=exc), reply_markup=kb,
-        )
+        await prompt.finish(context.bot, i18n.t(lang, "renamed_failed", error=exc), reply_markup=kb)
 
     context.user_data.clear()
     return ConversationHandler.END
@@ -876,7 +886,7 @@ async def delete_pack_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton(i18n.t(lang, "btn_cancel_inline"), callback_data=f"packopen:{pack_name}")],
         ]
     )
-    await query.message.edit_text(
+    await edit_in_place(query.message, context.bot, 
         i18n.t(lang, "delete_confirm1", title=title),
         reply_markup=kb,
     )
@@ -901,7 +911,7 @@ async def delete_pack_confirm1(update: Update, context: ContextTypes.DEFAULT_TYP
             [InlineKeyboardButton(i18n.t(lang, "btn_cancel_inline"), callback_data=f"packopen:{pack_name}")],
         ]
     )
-    await query.message.edit_text(
+    await edit_in_place(query.message, context.bot, 
         i18n.t(lang, "delete_confirm2", title=title),
         reply_markup=kb,
     )
@@ -926,14 +936,14 @@ async def delete_pack_confirm2(update: Update, context: ContextTypes.DEFAULT_TYP
         lower = str(exc).lower()
         if "invalid" not in lower and "not found" not in lower:
             logger.exception("Failed to delete sticker set")
-            await query.message.edit_text(i18n.t(lang, "delete_failed", error=exc))
+            await edit_in_place(query.message, context.bot, i18n.t(lang, "delete_failed", error=exc))
             return
         # Telegram already has no record of it (e.g. auto-deleted earlier
         # after its last sticker was removed) -- just clean up our side.
 
     await asyncio.to_thread(delete_pack_records, pack_name)
     kb = InlineKeyboardMarkup([[InlineKeyboardButton(i18n.t(lang, "btn_my_packs_back"), callback_data="menu_mypacks")]])
-    await query.message.edit_text(i18n.t(lang, "delete_success", title=title), reply_markup=kb)
+    await edit_in_place(query.message, context.bot, i18n.t(lang, "delete_success", title=title), reply_markup=kb)
 
 
 # ---------- /newpack (and "New pack" button) ----------
@@ -949,9 +959,10 @@ async def newpack_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.callback_query.answer()
     msg = await reply(update, i18n.t(lang, "newpack_title_prompt"))
     # So receive_title can turn THIS message into the status display below,
-    # instead of sending a separate one once the title arrives.
-    context.user_data["title_prompt_chat_id"] = msg.chat_id
-    context.user_data["title_prompt_msg_id"] = msg.message_id
+    # instead of sending a separate one once the title arrives -- assuming
+    # it is still the last thing in the chat by then, which is exactly what
+    # the handle is for.
+    context.user_data["title_prompt"] = msg.save()
     return TITLE
 
 
@@ -966,11 +977,9 @@ async def receive_title(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(i18n.t(lang, "title_truncated", title=title))
 
     intro = i18n.t(lang, "editing_intro_new")
-    edit_chat = context.user_data.pop("title_prompt_chat_id", None)
-    edit_id = context.user_data.pop("title_prompt_msg_id", None)
+    prompt = context.user_data.pop("title_prompt", None)
     await _start_status(
-        context, edit_chat or update.effective_chat.id, title, lang,
-        intro=intro, edit_message_id=edit_id,
+        context, update.effective_chat.id, title, lang, intro=intro, adopt=prompt,
     )
     return EDITING
 
@@ -1012,7 +1021,7 @@ async def pack_chosen(update: Update, context: ContextTypes.DEFAULT_TYPE):
     title = await asyncio.to_thread(get_pack_title, pack_name) or pack_name
     await _start_status(
         context, query.message.chat_id, title, lang,
-        intro=intro, edit_message_id=query.message.message_id,
+        intro=intro, adopt=LiveMessage.adopt(query.message).save(),
     )
     return EDITING
 
@@ -1171,7 +1180,7 @@ async def confirm_remove_last_sticker(update: Update, context: ContextTypes.DEFA
     file_id = context.user_data.pop("pending_removal", None)
 
     if choice == "no" or not file_id:
-        await query.message.edit_text(i18n.t(lang, "keep_pack"))
+        await edit_in_place(query.message, context.bot, i18n.t(lang, "keep_pack"))
         return EDITING
 
     target_pack = context.user_data.get("target_pack")
@@ -1180,12 +1189,12 @@ async def confirm_remove_last_sticker(update: Update, context: ContextTypes.DEFA
     except Exception as exc:
         logger.exception("Failed to delete the last sticker / pack")
         record_error(exc)
-        await query.message.edit_text(i18n.t(lang, "remove_failed", error=exc))
+        await edit_in_place(query.message, context.bot, i18n.t(lang, "remove_failed", error=exc))
         return EDITING
 
     if target_pack:
         await asyncio.to_thread(delete_pack_records, target_pack)  # Telegram auto-deleted the empty set
-    await query.message.edit_text(i18n.t(lang, "pack_deleted_empty"))
+    await edit_in_place(query.message, context.bot, i18n.t(lang, "pack_deleted_empty"))
     await _end_status(context, i18n.t(lang, "pack_deleted_note"))
     context.user_data.clear()
     return ConversationHandler.END
@@ -1226,13 +1235,18 @@ async def receive_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
         last_id = await _add_input_sticker(context, update.effective_user, input_sticker)
         context.user_data["last_sticker_id"] = last_id
         context.user_data["sticker_count"] = context.user_data.get("sticker_count", 0) + 1
-        await _refresh_status(context, lang)
-        await msg.reply_text(i18n.t(lang, "added_default_emoji", emoji=DEFAULT_EMOJI))
+        # The confirmation goes *into* the status message rather than under
+        # it. A separate "added ✅" reply would sit below the status and push
+        # it out of last place on every single sticker, which is the one
+        # thing an evolving message cannot survive.
+        await _refresh_status(context, lang, i18n.t(lang, "added_default_emoji", emoji=DEFAULT_EMOJI))
     except Exception as exc:
         logger.exception("Sticker set operation failed")
         record_error(exc)
-        await msg.reply_text(_explain_sticker_error(exc, lang))
-        await _refresh_status(context, lang, i18n.t(lang, "last_attempt_failed"))
+        await _refresh_status(
+            context, lang,
+            _explain_sticker_error(exc, lang) + "\n" + i18n.t(lang, "last_attempt_failed"),
+        )
 
     return EDITING
 
@@ -1255,12 +1269,23 @@ async def receive_video_media(update: Update, context: ContextTypes.DEFAULT_TYPE
     else:
         return EDITING
 
+    # An encode takes longer than the platform's shutdown grace period, so
+    # starting one into a landing update would only end in silence. Saying so
+    # costs the user a few seconds; not saying so costs them the file.
+    refusal = await refuse_new_work(lang, update.effective_user.id, msg.chat_id)
+    if refusal:
+        await msg.reply_text(refusal)
+        return EDITING
+
     tg_file = await context.bot.get_file(file_id)
     raw = await tg_file.download_as_bytearray()
 
-    status = await msg.reply_text(i18n.t(lang, "converting_video"))
+    # The status message *is* the progress message: one bot message per
+    # action, always at the bottom of the chat, always current.
+    await _refresh_status(context, lang, i18n.t(lang, "converting_video"))
     try:
-        webm_bytes = await asyncio.to_thread(to_video_sticker_webm, bytes(raw), lang)
+        async with lifecycle.busy(msg.chat_id, i18n.t(lang, "restarting_send_again")):
+            webm_bytes = await asyncio.to_thread(to_video_sticker_webm, bytes(raw), lang)
     except ConversionError as exc:
         # Couldn't hit the 256 KB video-sticker target -- the raw clip itself is
         # still fine, so point at @ConvertBot for a plain (non-sticker)
@@ -1269,15 +1294,23 @@ async def receive_video_media(update: Update, context: ContextTypes.DEFAULT_TYPE
         # the file over there themselves.
         record_error(exc)
         kb = InlineKeyboardMarkup([sibling_bots_keyboard_row(BOT_NAME, only="convertbot")])
-        await status.edit_text(
-            i18n.t(lang, "video_convert_failed_redirect", error=exc),
-            reply_markup=kb,
+        # The buttons need a message of their own -- an inline keyboard on
+        # the status line would still be sitting there, live, several
+        # stickers later. bump() then tells the status handle that something
+        # has been sent underneath it (the watermark only watches the *user*,
+        # which is right everywhere except here), so the refresh moves the
+        # status down to the bottom instead of rewriting it above the
+        # buttons.
+        sent = await msg.reply_text(
+            i18n.t(lang, "video_convert_failed_redirect", error=exc), reply_markup=kb,
         )
+        live_message.bump(sent.chat_id, sent.message_id)
+        await _refresh_status(context, lang)
         return EDITING
     except Exception as exc:
         logger.exception("Video conversion failed")
         record_error(exc)
-        await status.edit_text(i18n.t(lang, "video_convert_generic_failed", error=exc))
+        await _refresh_status(context, lang, i18n.t(lang, "video_convert_generic_failed", error=exc))
         return EDITING
 
     input_sticker = InputSticker(sticker=webm_bytes, emoji_list=[DEFAULT_EMOJI], format="video")
@@ -1286,13 +1319,14 @@ async def receive_video_media(update: Update, context: ContextTypes.DEFAULT_TYPE
         last_id = await _add_input_sticker(context, update.effective_user, input_sticker)
         context.user_data["last_sticker_id"] = last_id
         context.user_data["sticker_count"] = context.user_data.get("sticker_count", 0) + 1
-        await _refresh_status(context, lang)
-        await status.edit_text(i18n.t(lang, "added_video_default_emoji", emoji=DEFAULT_EMOJI))
+        await _refresh_status(context, lang, i18n.t(lang, "added_video_default_emoji", emoji=DEFAULT_EMOJI))
     except Exception as exc:
         logger.exception("Sticker set operation failed")
         record_error(exc)
-        await status.edit_text(_explain_sticker_error(exc, lang))
-        await _refresh_status(context, lang, i18n.t(lang, "last_attempt_failed"))
+        await _refresh_status(
+            context, lang,
+            _explain_sticker_error(exc, lang) + "\n" + i18n.t(lang, "last_attempt_failed"),
+        )
 
     return EDITING
 
@@ -1320,37 +1354,41 @@ async def import_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(i18n.t(lang, "import_invalid_source"))
         return EDITING
 
-    status = await update.message.reply_text(i18n.t(lang, "import_fetching", source=pack_source))
+    # Progress and result both land in the session's status message -- see
+    # _start_status. A bulk import is the longest thing this bot does, so it
+    # is also the one most likely to have the user typing over it; the
+    # handle moves the whole report down to the bottom when they do.
+    await _refresh_status(context, lang, i18n.t(lang, "import_fetching", source=pack_source))
     try:
         stickers = await fetch_importable_stickers(context.bot, pack_source, lang)
     except PackImportError as exc:
-        await status.edit_text(str(exc))
+        await _refresh_status(context, lang, str(exc))
         return EDITING
 
     added, skipped, failed = 0, 0, 0
-    for sticker in stickers[:MAX_IMPORT_PER_RUN]:
-        input_sticker = sticker_to_input_sticker(sticker)
-        if input_sticker is None:
-            skipped += 1
-            continue
-        try:
-            await _add_input_sticker(context, update.effective_user, input_sticker, want_file_id=False)
-            context.user_data["sticker_count"] = context.user_data.get("sticker_count", 0) + 1
-            added += 1
-            await asyncio.sleep(0.3)  # be gentle with Telegram's API during bulk adds
-        except Exception:
-            logger.exception("Import: failed to add one sticker")
-            failed += 1
+    async with lifecycle.busy(update.effective_chat.id, i18n.t(lang, "restarting_send_again")):
+        for sticker in stickers[:MAX_IMPORT_PER_RUN]:
+            input_sticker = sticker_to_input_sticker(sticker)
+            if input_sticker is None:
+                skipped += 1
+                continue
+            try:
+                await _add_input_sticker(context, update.effective_user, input_sticker, want_file_id=False)
+                context.user_data["sticker_count"] = context.user_data.get("sticker_count", 0) + 1
+                added += 1
+                await asyncio.sleep(0.3)  # be gentle with Telegram's API during bulk adds
+            except Exception:
+                logger.exception("Import: failed to add one sticker")
+                failed += 1
 
     await _remember_last_sticker(context)
-    await _refresh_status(context, lang)
     summary = i18n.t(lang, "import_summary_head", added=added, source=pack_source)
     if skipped:
         summary += i18n.t(lang, "import_summary_skipped", skipped=skipped)
     if failed:
         summary += i18n.t(lang, "import_summary_failed", failed=failed)
     summary += i18n.t(lang, "import_summary_tail")
-    await status.edit_text(summary)
+    await _refresh_status(context, lang, summary)
     return EDITING
 
 
@@ -1377,32 +1415,32 @@ async def receive_whatsapp_import(update: Update, context: ContextTypes.DEFAULT_
     tg_file = await context.bot.get_file(msg.document.file_id)
     raw = await tg_file.download_as_bytearray()
 
-    status = await msg.reply_text(i18n.t(lang, "whatsapp_reading"))
+    await _refresh_status(context, lang, i18n.t(lang, "whatsapp_reading"))
     try:
         items = await asyncio.to_thread(parse_whatsapp_zip, bytes(raw), lang)
     except PackImportError as exc:
-        await status.edit_text(str(exc))
+        await _refresh_status(context, lang, str(exc))
         return EDITING
 
     added, failed = 0, 0
-    for png_bytes, emojis in items:
-        input_sticker = InputSticker(sticker=png_bytes, emoji_list=emojis[:20], format="static")
-        try:
-            await _add_input_sticker(context, update.effective_user, input_sticker, want_file_id=False)
-            context.user_data["sticker_count"] = context.user_data.get("sticker_count", 0) + 1
-            added += 1
-            await asyncio.sleep(0.3)
-        except Exception:
-            logger.exception("WhatsApp import: failed to add one sticker")
-            failed += 1
+    async with lifecycle.busy(msg.chat_id, i18n.t(lang, "restarting_send_again")):
+        for png_bytes, emojis in items:
+            input_sticker = InputSticker(sticker=png_bytes, emoji_list=emojis[:20], format="static")
+            try:
+                await _add_input_sticker(context, update.effective_user, input_sticker, want_file_id=False)
+                context.user_data["sticker_count"] = context.user_data.get("sticker_count", 0) + 1
+                added += 1
+                await asyncio.sleep(0.3)
+            except Exception:
+                logger.exception("WhatsApp import: failed to add one sticker")
+                failed += 1
 
     await _remember_last_sticker(context)
-    await _refresh_status(context, lang)
     summary = i18n.t(lang, "whatsapp_summary_head", added=added)
     if failed:
         summary += i18n.t(lang, "import_summary_failed", failed=failed)
     summary += i18n.t(lang, "import_summary_tail")
-    await status.edit_text(summary)
+    await _refresh_status(context, lang, summary)
     return EDITING
 
 
@@ -1483,7 +1521,7 @@ async def _cancel_items(update: Update, context: ContextTypes.DEFAULT_TYPE, lang
         items.append(CancelItem("rename",
                                 i18n.t(lang, "cancel_item_rename", title=title),
                                 i18n.t(lang, "cancel_button_rename")))
-    elif context.user_data.get("status_chat_id"):
+    elif _has_status(context):
         title = context.user_data.get("title") or i18n.t(lang, "status_default_title")
         items.append(CancelItem("editing",
                                 i18n.t(lang, "cancel_item_editing", title=title),
@@ -1594,7 +1632,18 @@ async def unknown_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def _post_init(application):
     await tune_runtime(application)
+    # Before a single getUpdates goes out: if the container this one is
+    # replacing is still polling, two processes would be splitting this
+    # bot's updates between them and getting 409 Conflict for their trouble.
+    await lifecycle.on_start(BOT_NAME)
     await application.bot.set_my_commands(BOT_COMMANDS)
+
+
+async def _post_stop(application):
+    # Order matters: lifecycle writes the in-progress state out, and
+    # flush_on_shutdown closes the connection pool it writes through.
+    await lifecycle.on_stop(application)
+    await flush_on_shutdown(application)
 
 
 def main():
@@ -1605,8 +1654,14 @@ def main():
 
     builder = (
         ApplicationBuilder().token(BOT_TOKEN)
-        .post_init(_post_init).post_stop(flush_on_shutdown)
+        .post_init(_post_init).post_stop(_post_stop)
     )
+    # Open conversations and half-finished packs, in Postgres, so a redeploy
+    # is not the end of somebody's editing session. None when it is switched
+    # off or the database will not have it -- see lifecycle.py.
+    state = lifecycle.persistence()
+    if state is not None:
+        builder = builder.persistence(state)
     if LOCAL_BOT_API_URL:
         base = LOCAL_BOT_API_URL.rstrip("/")
         builder = (
@@ -1620,6 +1675,9 @@ def main():
             "upload ceilings are lifted.", base, LOCAL_BOT_API_MODE,
         )
     app = builder.build()
+    # Before the handlers, because ConversationHandler(persistent=...) below
+    # asks lifecycle whether persistence actually came up.
+    lifecycle.install(app, BOT_NAME)
     app.add_error_handler(error_handler)
     app.add_handler(TypeHandler(Update, track_activity), group=-1)
     # Runs after track_activity but before every other handler (ConversationHandler
@@ -1678,6 +1736,10 @@ def main():
             ],
         },
         fallbacks=[CommandHandler("cancel", cancel_command), CommandHandler("start", start)],
+        # Named and persisted, so someone who was three stickers into a pack
+        # when the bot was redeployed sends the fourth and it just works.
+        name="stickerbot_pack_editing",
+        persistent=lifecycle.persistent(),
         # Without this, entry points are ignored for as long as a conversation
         # is open, and every one of them is a dead end mid-session: /newpack
         # fell through to unknown_command ("I don't recognize that command")
@@ -1752,10 +1814,16 @@ def main():
     # else (edited messages, channel posts, reactions, chat member changes)
     # Telegram now stops sending at all rather than this process downloading
     # and parsing it only to drop it.
-    app.run_polling(
+    # polling_kwargs() is what lets this process hear SIGTERM before
+    # python-telegram-bot shuts it down, so a redeploy can tell anyone
+    # mid-conversion what happened instead of leaving them waiting.
+    # drop_pending_updates stays off (its default): updates sent while the
+    # container was being replaced are still on Telegram's side, and this is
+    # the poll that collects them.
+    app.run_polling(**lifecycle.polling_kwargs(
         timeout=POLL_TIMEOUT,
         allowed_updates=[Update.MESSAGE, Update.CALLBACK_QUERY, Update.PRE_CHECKOUT_QUERY],
-    )
+    ))
 
 if __name__ == "__main__":
-    main()
+    main()
