@@ -414,6 +414,19 @@ async def whomade_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def _is_admin(user_id: int) -> bool:
     return user_id in ADMIN_IDS
+async def _deny(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """How an owner-only command answers everybody else: exactly the way a
+    misspelling does.
+
+    The intent was always to avoid confirming the command exists, and a bare
+    `return` looked like the way to do that. It is not: a bot that answers
+    every command it has and ignores precisely one has just pointed at the
+    interesting one, and to the person who typed it the bot simply looks
+    broken. Giving back the same sentence a typo gets makes the owner-only
+    commands indistinguishable from commands that were never there.
+    """
+    await unknown_command(update, context)
+
 
 
 async def whois_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -423,7 +436,7 @@ async def whois_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     of my friends is this". Owner-only: this surfaces info about other
     people, not something every user should be able to query."""
     if not _is_admin(update.effective_user.id):
-        return  # silently ignore -- don't confirm the command even exists
+        return await _deny(update, context)
 
     if not context.args or not context.args[0].lstrip("-").isdigit():
         await update.message.reply_text("Usage: /whois <user_id>")
@@ -459,7 +472,7 @@ async def messageas_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     bot. Only works if the user has messaged the bot before (Telegram
     doesn't let bots cold-message anyone). Owner-only for obvious reasons."""
     if not _is_admin(update.effective_user.id):
-        return
+        return await _deny(update, context)
 
     if len(context.args) < 2 or not context.args[0].lstrip("-").isdigit():
         await update.message.reply_text("Usage: /messageas <user_id> <message text>")
@@ -479,7 +492,7 @@ async def dbdump_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     zip of CSVs. Owner-only: this is the whole user table, not something to
     hand out on request."""
     if not _is_admin(update.effective_user.id):
-        return
+        return await _deny(update, context)
     status = await update.message.reply_text("Exporting the database...")
     try:
         data = await asyncio.to_thread(dump_database_csv_zip)
@@ -498,7 +511,7 @@ async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     process started, and active-user counts. Owner-only, same reasoning as
     /dbdump: this is operational info, not something every user should see."""
     if not _is_admin(update.effective_user.id):
-        return
+        return await _deny(update, context)
     now = datetime.now(timezone.utc)
     users_hour = await asyncio.to_thread(count_active_users_since, now - timedelta(hours=1))
     users_since_start = await asyncio.to_thread(count_active_users_since, START_TIME)
@@ -514,7 +527,7 @@ async def crashtest_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     every other admin command), or ask to have it removed once you're done
     testing."""
     if not _is_admin(update.effective_user.id):
-        return
+        return await _deny(update, context)
     raise RuntimeError("Manual /crashtest trigger -- error tracking is working as intended.")
 
 
@@ -1354,6 +1367,15 @@ async def import_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(i18n.t(lang, "import_invalid_source"))
         return EDITING
 
+    # A bulk import is the longest thing this bot does -- dozens of stickers
+    # added one at a time, paced to stay under Telegram's rate limit -- and it
+    # was the one long path with no check that an update was coming. Starting
+    # one into a landing deploy leaves a half-filled pack and no explanation.
+    refusal = await refuse_new_work(lang, update.effective_user.id, update.effective_chat.id)
+    if refusal:
+        await update.message.reply_text(refusal)
+        return EDITING
+
     # Progress and result both land in the session's status message -- see
     # _start_status. A bulk import is the longest thing this bot does, so it
     # is also the one most likely to have the user typing over it; the
@@ -1412,6 +1434,14 @@ async def receive_whatsapp_import(update: Update, context: ContextTypes.DEFAULT_
     sticker pack export and bulk-imported."""
     msg = update.message
     lang = await i18n.get_lang(update.effective_user.id, context)
+
+    # Same reasoning as /import, which this is the other half of: a zip of
+    # stickers added one by one outlasts a shutdown grace period easily.
+    refusal = await refuse_new_work(lang, update.effective_user.id, msg.chat_id)
+    if refusal:
+        await msg.reply_text(refusal)
+        return EDITING
+
     tg_file = await context.bot.get_file(msg.document.file_id)
     raw = await tg_file.download_as_bytearray()
 

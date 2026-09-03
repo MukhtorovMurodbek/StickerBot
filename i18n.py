@@ -195,10 +195,7 @@ STRINGS = {
         "pack_deleted_empty": "🗑️ Pack deleted (it had no stickers left).",
         "pack_deleted_note": "❌ Pack deleted.",
         "image_process_failed": "Couldn't process that image: {error}",
-        "added_default_emoji": (
-            "Added with default {emoji}. Send emoji now to retag it, "
-            "another image/GIF/video to keep going, or /done to finish."
-        ),
+        "added_default_emoji": "Added {emoji} — send an emoji to retag it.",
         "last_attempt_failed": "⚠️ Last attempt failed -- send another item to retry, or /cancel.",
         "converting_video": "Converting to a video sticker...",
         "video_convert_failed_redirect": (
@@ -460,11 +457,7 @@ STRINGS = {
         "pack_deleted_empty": "🗑️ To'plam o'chirildi (unda stiker qolmagan edi).",
         "pack_deleted_note": "❌ To'plam o'chirildi.",
         "image_process_failed": "Bu rasmni qayta ishlab bo'lmadi: {error}",
-        "added_default_emoji": (
-            "Standart {emoji} bilan qo'shildi. Uni qayta belgilash uchun hozir emoji "
-            "yuboring, davom etish uchun yana rasm/GIF/video yuboring yoki tugatish "
-            "uchun /done ni bosing."
-        ),
+        "added_default_emoji": "{emoji} bilan qo'shildi — qayta belgilash uchun emoji yuboring.",
         "last_attempt_failed": "⚠️ Oxirgi urinish muvaffaqiyatsiz tugadi — qayta urinish uchun boshqa narsa yuboring yoki /cancel qiling.",
         "converting_video": "Video stikerga aylantirilmoqda...",
         "video_convert_failed_redirect": (
@@ -729,11 +722,7 @@ STRINGS = {
         "pack_deleted_empty": "🗑️ Набор удалён (в нём не осталось стикеров).",
         "pack_deleted_note": "❌ Набор удалён.",
         "image_process_failed": "Не удалось обработать это изображение: {error}",
-        "added_default_emoji": (
-            "Добавлено с эмодзи {emoji} по умолчанию. Отправьте эмодзи сейчас, чтобы "
-            "переметить, ещё одно изображение/GIF/видео, чтобы продолжить, или "
-            "/done, чтобы закончить."
-        ),
+        "added_default_emoji": "Добавлено {emoji} — отправьте эмодзи, чтобы переметить.",
         "last_attempt_failed": "⚠️ Последняя попытка не удалась — отправьте другой файл, чтобы попробовать снова, или /cancel.",
         "converting_video": "Преобразование в видео-стикер...",
         "video_convert_failed_redirect": (
