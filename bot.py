@@ -107,6 +107,7 @@ from import_utils import (
     MAX_IMPORT_PER_RUN,
 )
 from shared_features import (
+    attach_flood_gate,
     attach_maintenance,
     refuse_new_work,
     CANCEL_PICK_ALL,
@@ -1512,7 +1513,8 @@ async def done(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Finishing a pack is a natural "successful action" checkpoint -- see
     # shared_features.py for the cadence this is throttled to (not shown every time).
-    nudge = await maybe_donation_nudge(update.effective_user.id, lang)
+    nudge = await maybe_donation_nudge(
+        update.effective_user.id, lang, context, update.effective_chat.id)
     if nudge:
         await update.message.reply_text(nudge)
 
@@ -1709,7 +1711,17 @@ def main():
     # asks lifecycle whether persistence actually came up.
     lifecycle.install(app, BOT_NAME)
     app.add_error_handler(error_handler)
-    app.add_handler(TypeHandler(Update, track_activity), group=-1)
+    # ---- the handlers that run before everything else ----
+    # ONE GROUP EACH, and that is the whole point. python-telegram-bot runs
+    # at most ONE handler per group: the first whose filter matches wins and
+    # the rest of that group is skipped. track_activity is a TypeHandler on
+    # Update, so it matches every update there is -- which meant that for as
+    # long as these shared a group, it won every time and nothing else here
+    # ever ran. Separate groups, in the order they have to happen in.
+    app.add_handler(TypeHandler(Update, track_activity), group=-4)
+    # Counted first, then throttled: somebody who floods is still somebody
+    # who was here, and /status is supposed to say so.
+    attach_flood_gate(app, ADMIN_IDS)
     # Runs after track_activity but before every other handler (ConversationHandler
     # included) -- a no-op unless a "Custom" donate button was just tapped, in
     # which case it consumes the reply and stops it from also being treated as,
@@ -1856,4 +1868,4 @@ def main():
     ))
 
 if __name__ == "__main__":
-    main()
+    main()

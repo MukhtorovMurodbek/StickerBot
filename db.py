@@ -335,6 +335,15 @@ def init_db(dsn: str = DATABASE_URL) -> None:
             )
             """
         )
+        # How many times this person has ever been shown the nudge. The
+        # cadence is a schedule that runs out rather than a loop (see
+        # DONATION_STEPS in shared_features.py), and this is the step counter
+        # it reads. Safe to re-run on an existing table.
+        conn.execute("ALTER TABLE donation_prompts ADD COLUMN IF NOT EXISTS times_shown INTEGER NOT NULL DEFAULT 0")
+        # Set only when DONATION_PIN is on: the message this bot pinned, so
+        # it can be unpinned again when they donate or when a newer nudge
+        # replaces it.
+        conn.execute("ALTER TABLE donation_prompts ADD COLUMN IF NOT EXISTS pinned_message_id BIGINT")
         conn.execute(
             """
             CREATE TABLE IF NOT EXISTS activity_events (
@@ -387,6 +396,17 @@ def count_active_users_since(since) -> int:
         )
         return cur.fetchone()[0]
 
+
+
+def active_user_ids_since(since) -> list[int]:
+    """Everyone with activity since `since`. Used by the family bus for an
+    aimed broadcast -- see BROADCAST_ACTIVE_DAYS in family_link.py."""
+    with pooled_read() as conn:
+        cur = conn.execute(
+            "SELECT DISTINCT user_id FROM activity_events WHERE occurred_at >= %s",
+            (since,),
+        )
+        return [row[0] for row in cur.fetchall()]
 
 def list_all_users() -> list[int]:
     """Everyone this bot could send an unprompted message to.
@@ -617,38 +637,83 @@ def update_star_transaction(payload: str, status: str, charge_id: str | None = N
 
 # ---------- donation-reminder cooldown ----------
 
-def bump_donation_action(user_id: int) -> tuple[int, str | None]:
-    """Increments this user's action counter and returns (new total, when the
-    nudge was last shown). One statement, because this runs on the success
-    path of every completed action and the two halves were previously two
-    separate round trips."""
+def bump_donation_action(user_id: int) -> tuple[int, str | None, int, bool]:
+    """Increments this user's action counter and returns everything the nudge
+    decision needs: (actions since the last nudge, when it was last shown,
+    how many times it has ever been shown, has this person ever donated).
+
+    One statement. This runs on the success path of every completed action --
+    every finished pack, every conversion, every download -- so it is one of
+    the hottest writes in the family, and the database is on another
+    continent. The donation check used to be two round trips and the "have
+    they already given" question would have made it three.
+
+    `times_shown` is what turns the cadence from "every N actions forever"
+    into a schedule that runs out: see DONATION_STEPS in shared_features.py.
+    The paid check is what stops the bot thanking somebody by asking them
+    again.
+    """
     with pooled() as conn:
         cur = conn.execute(
             """
-            INSERT INTO donation_prompts (user_id, action_count, last_shown_at)
-            VALUES (%s, 1, NULL)
-            ON CONFLICT (user_id) DO UPDATE SET action_count = donation_prompts.action_count + 1
-            RETURNING action_count, last_shown_at
+            WITH bumped AS (
+                INSERT INTO donation_prompts (user_id, action_count, last_shown_at)
+                VALUES (%(uid)s, 1, NULL)
+                ON CONFLICT (user_id) DO UPDATE
+                   SET action_count = donation_prompts.action_count + 1
+                RETURNING action_count, last_shown_at, times_shown
+            )
+            SELECT b.action_count, b.last_shown_at, b.times_shown,
+                   EXISTS (SELECT 1 FROM star_transactions t
+                            WHERE t.user_id = %(uid)s AND t.status = 'paid')
+            FROM bumped b
             """,
-            (user_id,),
+            {"uid": user_id},
         )
         row = cur.fetchone()
         conn.commit()
-        return row[0], row[1]
+        return row[0], row[1], row[2] or 0, bool(row[3])
 
 
 def reset_donation_prompt(user_id: int) -> None:
-    """Zeroes the action counter and stamps 'last_shown_at' -- call right
-    after actually showing the nudge, not on every check."""
+    """Zeroes the action counter, stamps 'last_shown_at' and counts the
+    showing -- call right after actually showing the nudge, not on every
+    check."""
     now = datetime.now(timezone.utc).isoformat()
     with pooled() as conn:
         conn.execute(
             """
-            INSERT INTO donation_prompts (user_id, action_count, last_shown_at)
-            VALUES (%s, 0, %s)
-            ON CONFLICT (user_id) DO UPDATE SET action_count = 0, last_shown_at = excluded.last_shown_at
+            INSERT INTO donation_prompts (user_id, action_count, last_shown_at, times_shown)
+            VALUES (%s, 0, %s, 1)
+            ON CONFLICT (user_id) DO UPDATE SET
+                action_count = 0,
+                last_shown_at = excluded.last_shown_at,
+                times_shown = donation_prompts.times_shown + 1
             """,
             (user_id, now),
+        )
+        conn.commit()
+
+
+def get_pinned_donation_message(user_id: int) -> int | None:
+    """The id of the nudge this bot pinned in that person's chat, if any."""
+    with pooled_read() as conn:
+        cur = conn.execute(
+            "SELECT pinned_message_id FROM donation_prompts WHERE user_id = %s", (user_id,)
+        )
+        row = cur.fetchone()
+        return row[0] if row else None
+
+
+def set_pinned_donation_message(user_id: int, message_id: int | None) -> None:
+    with pooled() as conn:
+        conn.execute(
+            """
+            INSERT INTO donation_prompts (user_id, action_count, pinned_message_id)
+            VALUES (%s, 0, %s)
+            ON CONFLICT (user_id) DO UPDATE SET pinned_message_id = excluded.pinned_message_id
+            """,
+            (user_id, message_id),
         )
         conn.commit()
 

@@ -34,6 +34,7 @@ LANGUAGE_PROMPT = (
 
 STRINGS = {
     "en": {
+        "flood_wait": "You're going faster than I can keep up with -- give it about {seconds} second(s) and carry on.",
         # ---- shared keys (same name in every bot's i18n.py) ----
         "sibling_blurb": "Also part of this bot family, see below \U0001f447",
         "donation_nudge": (
@@ -289,6 +290,7 @@ STRINGS = {
         "import_zip_no_images": "No usable images found inside that zip.",
     },
     "uz": {
+        "flood_wait": "Siz men ulgurganimdan tezroq yuboryapsiz -- taxminan {seconds} soniya kutib, davom eting.",
         "sibling_blurb": "Bu bot oilasining bir qismi, pastda ko'ring \U0001f447",
         "donation_nudge": (
             "💙 Agar bu bot foydali bo'lgan bo'lsa: hosting/API xarajatlarini uni ishga "
@@ -557,6 +559,7 @@ STRINGS = {
         "import_zip_no_images": "Bu zip ichida ishlatsa bo'ladigan rasm topilmadi.",
     },
     "ru": {
+        "flood_wait": "Ты отправляешь быстрее, чем я успеваю -- подожди примерно {seconds} секунд(ы) и продолжай.",
         "sibling_blurb": "Тоже часть этой семьи ботов, смотри ниже \U0001f447",
         "donation_nudge": (
             "💙 Если этот бот оказался полезным: расходы на хостинг/API покрывает тот, "

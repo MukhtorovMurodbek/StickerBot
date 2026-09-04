@@ -1,132 +1,128 @@
 # StickerBot
 
-Telegram bot for creating and managing sticker packs: turn images, GIFs,
-videos, and existing stickers into a Telegram sticker pack, co-edit packs
-with other people via a share link, and bulk-import from another Telegram
-pack or a WhatsApp sticker pack export.
+A Telegram bot for creating and managing sticker packs. It turns images,
+GIFs, videos and existing stickers into a Telegram sticker pack, lets a pack
+be co-edited by several people through a share link, and can bulk-import
+from another public Telegram pack or from a WhatsApp sticker export.
 
-This bot is its own process, its own repo and its own deployment — it can
-be run entirely on its own. It shares one Postgres database with the rest
-of the family, but only in the sense that its tables live in their own
-schema inside it (`DB_SCHEMA` in `.env`); no other bot reads or writes
-them. The exception is `family.*`, where this bot posts a heartbeat and
-any crash so that ParentBot can watch it — see `family_link.py`, and
-ARCHITECTURE.md in the family monorepo for why it is arranged this way. Set `FAMILY_BUS=off`
-to opt out of that entirely.
+Runs as its own process, its own repository and its own deployment, and can
+be run entirely standalone. It shares a Postgres database with four sibling
+bots only in the sense that its tables live in a schema of their own inside
+it (`DB_SCHEMA`); no other bot reads or writes them. The one shared area is
+`family.*`, where the bot posts a heartbeat and any crash so a monitoring bot
+can watch it — `FAMILY_BUS=off` disables that entirely.
+
+---
 
 ## Commands
 
-- `/newpack` — start a new sticker pack
-- `/addsticker` — add stickers to an existing pack
-- `/mypacks` — list your packs (tap one to rename or set up co-editing)
-- `/import <pack link/name>` — (while editing) bulk-copy stickers from
-  another public Telegram pack, or send a WhatsApp `.zip`/`.wastickers` file
-- `/done` — finish editing a pack
-- `/cancel` — asks which of the things it is waiting on you for to stop,
-  as one button each, and stops nothing until you pick. With nothing pending
-  it says so straight away, as it always did. A pack you are three
-  stickers into is no longer collateral damage of wanting out of a donation
-  prompt
-- `/whomade <pack link/name>` — see who created a pack (if made through this bot)
-- `/donate` — chip in for hosting costs (voluntary, Telegram Stars)
-- `/start` — the full instructions. The first `/start` from a brand-new
-  user asks for a language before printing them, which is the one and only
-  time it asks; after that it prints them in the language on record
-- `/language` — the picker on demand: a short greeting in all three
-  languages and one row of buttons, with a tick on the language in force.
-  Choosing one (even the one already set) reprints the instructions in it
-- `/en`, `/uz`, `/rus` — switch language directly, skipping the picker;
-  each also reprints the instructions in the language just chosen
-- `/help` — the instructions on their own
-- `/convert` — a friendly redirect to @ConvertBot, which is where file
-  conversion lives now; kept for anyone still typing it out of habit
+| command | what it does |
+|---|---|
+| `/newpack` | Start a new sticker pack. |
+| `/addsticker` | Add stickers to an existing pack. |
+| `/mypacks` | List the user's packs; tapping one offers rename and co-editing. |
+| `/import <pack link or name>` | While editing, bulk-copy stickers from another public pack. Also accepts a WhatsApp `.zip` or `.wastickers` export sent as a file. |
+| `/done` | Finish editing. |
+| `/whomade <pack link or name>` | Who created a pack, if it was made through this bot. |
+| `/cancel` | Asks which of the things the bot is waiting on should stop, one button each, and stops nothing until one is chosen. |
+| `/donate` | Voluntary contribution towards hosting, paid in Telegram Stars. |
+| `/start` | Instructions. The first `/start` from a new user asks which language to use, once. |
+| `/language`, `/en`, `/uz`, `/rus` | Switch language. Each reprints the instructions in the language chosen. |
+| `/help` | The instructions on their own. |
 
-Owner-only (requires `SBOT_ADMIN_ID` in `.env` — silently do nothing for
-everyone else):
-- `/whois <user_id>` — look up a Telegram user's name/username/bio plus any
-  packs of theirs on record, e.g. to turn a `/whomade` id back into "which
-  friend is this"
-- `/messageas <user_id> <text>` — send a message to that user as this bot
-  (only works if they've messaged the bot before — Telegram doesn't allow
-  bots to cold-message anyone)
-- `/dbdump` — export this bot's tables as a zip of CSVs
-- `/status` — uptime, host, crashes since this process started, active users
+Restricted to the account ids in `SBOT_ADMIN_ID`, and answering everyone else
+exactly as a misspelt command does, so their existence is not disclosed:
+`/whois <user_id>` (a user's name, username and bio, plus any packs of theirs
+on record), `/messageas <user_id> <text>`, `/dbdump`, `/status` and
+`/crashtest`.
 
-## Setup
+Telegram does not allow a bot to message someone who has never messaged it,
+so `/messageas` only reaches people who have used the bot before.
 
-1. Install dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
-   Requires `ffmpeg` on `PATH` (for video-sticker conversion).
-2. Copy `.env.example` to `.env` and fill in `SBOT_TOKEN`/`SBOT_USERNAME`
-   (from [@BotFather](https://t.me/BotFather)). Optionally set `SBOT_ADMIN_ID`
-   to your own numeric user id to unlock `/whois` and `/messageas`.
-3. Start the family's shared Postgres, from the monorepo root:
-   ```
-   docker compose up -d
-   ```
-   That is one database (`botfamily`) for all five bots, with a schema
-   each — this one uses `DB_SCHEMA=sticker_bot`. No Docker? Install
-   Postgres directly and point `DATABASE_URL` at it instead.
-4. Run it:
-   ```
-   python bot.py
-   ```
+---
 
-## Deploying (e.g. Railway)
+## How it works
 
-The short version is below; DEPLOY.md in the family monorepo covers all five in one
-pass, which is easier than doing five of these separately.
+**Encoding.** Video stickers have to fit inside Telegram's 256 KB ceiling as
+WebM/VP9. The encoder measures rather than laddering blindly: it estimates a
+bitrate from the clip's length and dimensions, encodes once, and only retries
+if the result missed. Static stickers are resized to Telegram's 512-pixel
+box with transparency preserved.
 
-1. Point `DATABASE_URL` at the family's Postgres, and set `DB_SCHEMA` to
-   `sticker_bot`. On Railway that first one is a reference variable,
-   `${{Postgres.DATABASE_URL}}`, so several services can share one database.
-2. Set `SBOT_TOKEN`, `SBOT_USERNAME`, and the rest of `.env` as environment
-   variables on the service.
-3. Deploy — `pip install -r requirements.txt` then `python bot.py`.
+**Co-editing.** A pack has one creator and any number of editors, added by
+share link. Editors can add and remove stickers; only the creator can rename
+or hand the pack on.
 
-### Updating a running bot
+**Importing.** A Telegram pack is copied by file id, so nothing is
+re-encoded. A WhatsApp export is a zip of WebP images, which are converted.
 
-Pushing an update replaces the container, and the bots are set up so nobody
-notices: the new process waits on a Postgres advisory lock until the old one
-has stopped polling (no 409 Conflict, no split updates), open conversations
-and half-finished sessions are restored from the `runtime_state` table in
-this bot's own schema, and anyone whose upload was mid-flight is told to send
-it again rather than left waiting. Updates sent during the gap are held by
-Telegram and delivered on the first poll.
+**Limits.** A ceiling on updates per minute applies per account, before any
+handler runs, so a script cannot hold the process busy. It is configurable;
+see `.env.example`.
 
-`../UPDATES.md` has the whole picture, including what to check after a push.
-`DEPLOY_SAFETY=off` turns all of it off and restores the old behaviour.
+---
 
-## Keeping a local and cloud database in sync
+## Running it
 
-If you ever run this bot from both your laptop and the cloud at different
-times, `db_merge.py` reconciles the two additively (never deletes or
-overwrites anything):
+```bash
+pip install -r requirements.txt
+cp .env.example .env          # fill in SBOT_TOKEN and SBOT_USERNAME
+python bot.py
 ```
-python db_merge.py --from local --into cloud --dry-run   # preview first
-python db_merge.py --from local --into cloud             # actually do it
+
+`SBOT_TOKEN` and `SBOT_USERNAME` come from
+[@BotFather](https://t.me/BotFather). `SBOT_ADMIN_ID` is optional and takes
+one or more numeric account ids.
+
+The bot needs a Postgres database (`DATABASE_URL`, with `DB_SCHEMA`
+defaulting to `sticker_bot`) and `ffmpeg` on `PATH` for video stickers. The
+schema and its tables are created on first run.
+
+### Deploying
+
+Set the same values as environment variables on the host and run
+`python bot.py`. `railway.json` and `nixpacks.toml` configure a Railway
+deployment; neither is required elsewhere.
+
+A deployment replaces the running container, and the bot is built so that
+costs nothing visible. The new process waits on a Postgres advisory lock
+until the old one has stopped polling, so Telegram never sees two consumers
+of one token. A pack half-built survives, restored from a `runtime_state`
+table. Anything mid-encode is announced rather than left silent. Updates sent
+during the gap are held by Telegram and delivered on the first poll — nothing
+is lost. `DEPLOY_SAFETY=off` disables all of it.
+
+### Keeping two databases in sync
+
+`db_merge.py` reconciles a local database with a remote one additively — it
+never deletes or overwrites.
+
+```bash
+python db_merge.py --from local --into cloud --dry-run
+python db_merge.py --from local --into cloud
 ```
-Read the script's docstring for exactly how conflicts are handled.
 
-## Optional: cross-promoting sibling bots
-
-If you're running this alongside other bots (e.g. a downloader or converter
-bot) and want each to mention the others in `/start`/`/help`, set
-`SIBLING_BOTS` in `.env` — see the comment in `shared_features.py`. Purely
-cosmetic (display text + link buttons); no database or file is shared.
+---
 
 ## Files
 
-- `bot.py` — handlers and the pack-editing conversation flow
-- `db.py` — this bot's own Postgres schema and queries
-- `family_link.py` — heartbeats, crash reporting, and the queue ParentBot
-  uses to run this bot's owner-only commands (identical in every bot)
-- `live_message.py` — the rule that a bot message only keeps evolving while
-  it is still the last thing in the chat (identical in every bot)
-- `lifecycle.py` — surviving a redeploy: one poller at a time, state kept in
-  Postgres, in-flight work announced (identical in every bot)
-- `shared_features.py` — `/donate` (Telegram Stars) + sibling-bot cross-promotion
-- `image_utils.py` / `video_sticker.py` / `emoji_utils.py` / `import_utils.py` — sticker-format conversion and pack-import logic
-- `db_merge.py` — reconciles a laptop database with the cloud one, additively (see above)
+| file | |
+|---|---|
+| `bot.py` | Handlers and the pack-editing conversation |
+| `image_utils.py`, `video_sticker.py` | Resizing, and WebM/VP9 encoding to fit Telegram's limit |
+| `emoji_utils.py`, `import_utils.py` | Emoji handling; Telegram and WhatsApp imports |
+| `db.py` | This bot's schema, queries and connection pool |
+| `i18n.py` | English, Uzbek and Russian strings |
+| `family_link.py` | Heartbeats, crash reporting, and the command queue a monitoring bot uses |
+| `lifecycle.py` | Surviving a redeploy: one poller at a time, state in Postgres |
+| `live_message.py` | When a bot message may keep evolving in place |
+| `shared_features.py` | Donations, logging, activity tracking, flood control |
+| `db_merge.py` | Reconciles two databases, additively |
+
+`family_link.py`, `lifecycle.py`, `live_message.py` and `shared_features.py`
+are shared with the sibling bots by being copied rather than imported: each
+bot is a separate deployment, so nothing crosses a repository boundary.
+
+## Requirements
+
+Python 3.11 or newer, Postgres 16 or newer, and `ffmpeg`.
