@@ -107,6 +107,12 @@ from import_utils import (
     MAX_IMPORT_PER_RUN,
 )
 from shared_features import (
+    publish_profile,
+    ERASE_PREFIX,
+    delete_my_data_chosen,
+    delete_my_data_command,
+    privacy_command,
+    terms_command,
     attach_flood_gate,
     attach_maintenance,
     refuse_new_work,
@@ -201,6 +207,9 @@ BOT_COMMANDS = [
     BotCommand("en", "Switch to English"),
     BotCommand("uz", "O'zbekchaga o'tish"),
     BotCommand("rus", "Переключиться на русский"),
+    BotCommand("privacy", "What this bot keeps about you"),
+    BotCommand("terms", "What this bot may be used for"),
+    BotCommand("deletemydata", "Erase what this bot holds on you"),
 ]
 
 # ---------- small helpers ----------
@@ -1669,6 +1678,7 @@ async def _post_init(application):
     # bot's updates between them and getting 409 Conflict for their trouble.
     await lifecycle.on_start(BOT_NAME)
     await application.bot.set_my_commands(BOT_COMMANDS)
+    await publish_profile(application)
 
 
 async def _post_stop(application):
@@ -1747,6 +1757,13 @@ def main():
             CommandHandler("en", set_language_en),
             CommandHandler("uz", set_language_uz),
             CommandHandler("rus", set_language_rus),
+            # And /deletemydata, for the same reason and one more. Its END has
+            # to be honoured, or an erase leaves the state machine in EDITING
+            # holding a pack this bot has just been told to forget -- the next
+            # sticker then fails on state that is gone. The command itself
+            # returns None and moves nothing; only the confirmation ends it.
+            CommandHandler("deletemydata", delete_my_data_command),
+            CallbackQueryHandler(delete_my_data_chosen, pattern="^" + ERASE_PREFIX),
         ],
         states={
             TITLE: [MessageHandler(filters.TEXT & ~filters.COMMAND, receive_title)],
@@ -1803,6 +1820,14 @@ def main():
     app.add_handler(CommandHandler("en", set_language_en))
     app.add_handler(CommandHandler("uz", set_language_uz))
     app.add_handler(CommandHandler("rus", set_language_rus))
+    # ---- what the bot keeps, what it may be used for, and the erase button.
+    # Standalone for the same reason the language switches are: somebody who
+    # wants to know what is held on them, or wants it gone, should not have to
+    # finish whatever they were doing first. ----
+    app.add_handler(CommandHandler("privacy", privacy_command))
+    app.add_handler(CommandHandler("terms", terms_command))
+    app.add_handler(CommandHandler("deletemydata", delete_my_data_command))
+    app.add_handler(CallbackQueryHandler(delete_my_data_chosen, pattern="^" + ERASE_PREFIX))
     app.add_handler(CommandHandler("mypacks", mypacks_command))
     app.add_handler(CommandHandler("addsticker", addsticker_command))
     app.add_handler(CommandHandler("help", help_command))

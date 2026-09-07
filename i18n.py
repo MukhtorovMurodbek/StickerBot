@@ -34,7 +34,7 @@ LANGUAGE_PROMPT = (
 
 STRINGS = {
     "en": {
-        "flood_wait": "You're going faster than I can keep up with -- give it about {seconds} second(s) and carry on.",
+        "flood_wait": "You're going faster than I can keep up with — give it about {seconds} second(s) and carry on.",
         # ---- shared keys (same name in every bot's i18n.py) ----
         "sibling_blurb": "Also part of this bot family, see below \U0001f447",
         "donation_nudge": (
@@ -42,11 +42,11 @@ STRINGS = {
             "running it, and /donate is a totally optional way to help keep it alive. "
             "No pressure either way!"
         ),
-        "donate_unknown_currency": 'Unknown currency "{currency}" -- try xtr or usd.',
-        "donate_currency_not_configured": "{currency} donations aren't set up on this bot yet -- try Stars instead.",
-        "donate_invalid_amount": "That's not a valid amount -- try e.g. /donate 500 or /donate 5 usd.",
+        "donate_unknown_currency": 'Unknown currency "{currency}" — try xtr or usd.',
+        "donate_currency_not_configured": "{currency} donations aren't set up on this bot yet — try Stars instead.",
+        "donate_invalid_amount": "That's not a valid amount — try e.g. /donate 500 or /donate 5 usd.",
         "donate_prompt": (
-            "Thank you for contributing -- it goes directly toward this bot's "
+            "Thank you for contributing — it goes directly toward this bot's "
             "hosting and API costs. Choose an amount below, or Custom to enter "
             "your own (you can also send /donate <number> [usd] directly)."
         ),
@@ -59,13 +59,109 @@ STRINGS = {
         "donate_invoice_error": "⚠️ Telegram wouldn't create that invoice: {error}",
         "stars_unit": "Stars",
         "donate_custom_ask": "How many {unit} would you like to donate? Reply with a number.",
-        "donate_invalid_amount_retry": "That's not a valid amount -- send /donate to try again.",
+        "donate_invalid_amount_retry": "That's not a valid amount — send /donate to try again.",
         "donate_thanks": "🙏 Thank you for the {amount} ⭐ — genuinely appreciated!",
+        "bot_short_description": (
+            "Turns images, GIFs and videos into Telegram sticker packs."
+        ),
+        "bot_description": (
+            "Send a picture, a GIF or a video and this bot builds it into a sticker pack that "
+            "belongs to you.\n"
+            "\n"
+            "Share a pack for someone else to add to, or bulk-import one from another Telegram "
+            "pack or a WhatsApp export.\n"
+            "\n"
+            "English, Uzbek and Russian. /privacy says what it keeps about you."
+        ),
+        # ---- shared policy keys (/privacy, /terms, /deletemydata) ----
+        "privacy_heading": "🔒 Privacy",
+        "privacy_kept_heading": "What this bot keeps:",
+        "privacy_stored": (
+            "• your Telegram user id, and the language you chose\n"
+            "• the packs you made here: each one's name and title, and the display name and "
+            "username you had at the time\n"
+            "• who you gave add-access to a pack, and the share links you created\n"
+            "• a timestamp each time you use the bot, so its owner can tell whether anyone is "
+            "using it\n"
+            "• a record of any donation: the amount and Telegram's payment id\n"
+            "• whatever the bot is in the middle of doing with you, until it is finished"
+        ),
+        "privacy_seen_by_heading": "Who else sees it:",
+        "privacy_seen_by": (
+            "• Telegram, which carries every message both ways and sets its own terms\n"
+            "• the hosting provider this bot runs on, and the database it writes to"
+        ),
+        "privacy_others": (
+            "• and nobody beyond those — stickers are made on the machine the bot runs on, and no outside "
+            "service is called"
+        ),
+        "privacy_kept_for_heading": "How long it stays:",
+        "privacy_kept_for": (
+            "Settings and anything the bot is holding for you stay until you erase them or stop "
+            "using it. Counted use is dropped after about three months. Payment records are kept "
+            "longer, because refunds are issued against them.\n"
+            "\n"
+            "Nothing here is sold, rented or used for advertising, and nothing goes to anyone not "
+            "named above."
+        ),
+        "privacy_your_choices": (
+            "What you can do:\n"
+            "/deletemydata — erase what this bot holds on you\n"
+            "/terms — what the bot may be used for\n"
+            "\n"
+            "Blocking the bot in Telegram stops it talking to you but erases nothing, so send "
+            "/deletemydata first if you want both."
+        ),
+        "terms_heading": "📜 Terms",
+        "terms_use": (
+            "Use it for what it is for, within the law and within Telegram's own terms. Do not "
+            "use it to harass anyone, and do not drive it past the limits it sets — an account "
+            "doing either is blocked."
+        ),
+        "terms_specific": (
+            "Stickers: upload what is yours to upload. Do not build packs out of someone else's "
+            "work without their permission, and do not make packs of anything Telegram's own "
+            "terms forbid. A pack lives on Telegram once it exists — this bot can forget one, "
+            "but only its owner can delete it, from Telegram."
+        ),
+        "terms_money": (
+            "Money: /donate is voluntary and buys nothing at all — it goes towards what the bot "
+            "costs to run. Telegram handles every payment and the bot never sees a card number. "
+            "Send one by mistake and it comes back if you ask."
+        ),
+        "terms_no_warranty": (
+            "No promises: one person runs this, it is free, and it can be slow, wrong, or off "
+            "entirely without warning. Keep your own copy of anything that matters."
+        ),
+        "policy_full_text": "Full text: {url}",
+        "policy_contact": "Questions, complaints or a data request: {contact}",
+        "delete_data_confirm": "⚠️ This erases what this bot holds on you. There is no undo.",
+        "delete_data_consequences": (
+            "The bot forgets the packs you made through it: it stops listing them and can no "
+            "longer add to them. The packs themselves keep working for everyone who installed "
+            "them — deleting one for real is done from Telegram, by you. Your language, your "
+            "share links and anyone's add-access to your packs go as well.\n"
+            "\n"
+            "Donation records stay, without your username, because refunds are issued against "
+            "them."
+        ),
+        "delete_data_button_yes": "🗑 Erase it",
+        "delete_data_button_no": "↩️ Keep my data",
+        "delete_data_kept": "Nothing was erased.",
+        "delete_data_done": (
+            "🗑 Done — {rows} record(s) erased.\n"
+            "\n"
+            "Send /start whenever you like; the bot will treat you as new."
+        ),
+        "delete_data_failed": (
+            "Couldn't erase that just now — something went wrong at my end. Please try again in "
+            "a few minutes."
+        ),
         "language_set_confirmation": "✅ Language set to English.",
         "cancel_header": "\u274c Cancelled:",
-        "cancel_nothing": "Nothing to cancel -- I wasn't waiting on anything from you.",
+        "cancel_nothing": "Nothing to cancel — I wasn't waiting on anything from you.",
         "cancel_ask": "What should I stop? Here's what I'm waiting on:",
-        "cancel_kept": "Alright -- nothing cancelled.",
+        "cancel_kept": "Alright — nothing cancelled.",
         "cancel_reply_box_freed": "Your reply box is free again.",
         "cancel_button_all": "❌ All of it",
         "cancel_button_none": "↩️ Nothing, keep going",
@@ -103,28 +199,26 @@ STRINGS = {
             "twice before it actually happens).\n\n"
             "Want to grab a video from Instagram/TikTok, or convert a file to another "
             "format? Those live in the sibling bots below now.\n\n"
-            "This bot is still being developed and hosted temporarily. If its not responding, "
-            "wait for it to respond, it will automatically respond when I start hosting it again most of the time.\n\n"
         ),
         "whomade_usage": "Usage: /whomade <pack name or t.me/addstickers link>",
         "whomade_not_found": (
-            "I don't have a record of that pack -- either it wasn't created "
+            "I don't have a record of that pack — either it wasn't created "
             "through this bot, or the name/link isn't right."
         ),
         "whomade_result": "📦 \"{title}\"\nCreated by {creator} on {date} (via this bot).",
-        "coedit_link_invalid": "That co-editing link isn't valid -- it may have been reset by the pack owner.",
+        "coedit_link_invalid": "That co-editing link isn't valid — it may have been reset by the pack owner.",
         "coedit_pack_gone": "That pack doesn't seem to exist anymore.",
-        "coedit_own_pack": "That's your own pack -- use /mypacks to manage it.",
+        "coedit_own_pack": "That's your own pack — use /mypacks to manage it.",
         "coedit_joined_intro": (
             "You've been added as a co-editor on \"{title}\"! Send images, GIFs, "
-            "videos, or static/video stickers to add them -- default emoji is 😭, "
+            "videos, or static/video stickers to add them — default emoji is 😭, "
             "send emoji right after to retag the last one. /done when finished."
         ),
         "btn_new_pack": "➕ New pack",
         "btn_my_packs": "📁 My packs",
         "btn_help": "❓ Help",
         "btn_back": "⬅️ Back",
-        "no_packs_yet": "No packs yet -- tap New pack or use /newpack.",
+        "no_packs_yet": "No packs yet — tap New pack or use /newpack.",
         "your_packs": "Your packs:",
         "not_your_pack": "That's not your pack.",
         "pack_detail_title": "📦 {title}",
@@ -138,17 +232,17 @@ STRINGS = {
         "coedit_message": (
             "👥 Co-editing \"{title}\"\n\n"
             "Link: {link}\n\n"
-            "Share it -- anyone who opens it can add stickers to this pack "
+            "Share it — anyone who opens it can add stickers to this pack "
             "through the bot (they still get added under your ownership).\n\n"
             "{editors_line}\n\n"
             "Reset the link to stop it from granting access to anyone new."
         ),
         "btn_reset_link": "🔄 Reset link",
         "only_owner_coedit": "Only the pack owner can manage co-editing.",
-        "link_reset_confirm": "Link reset -- the old one no longer works.",
+        "link_reset_confirm": "Link reset — the old one no longer works.",
         "only_owner_rename": "Only the pack owner can rename it.",
         "rename_prompt": "Send the new title for \"{title}\".",
-        "rename_broken_state": "Something went wrong -- try Rename again from /mypacks.",
+        "rename_broken_state": "Something went wrong — try Rename again from /mypacks.",
         "btn_back_to_pack": "⬅️ Back to pack",
         "renamed_success": "Renamed to \"{title}\".",
         "renamed_failed": "Couldn't rename it: {error}",
@@ -160,22 +254,22 @@ STRINGS = {
             "has it, including any co-editors, and can't be undone."
         ),
         "btn_delete_confirm": "🗑️ Yes, permanently delete it",
-        "delete_confirm2": "❗ Last check -- permanently delete \"{title}\"? There's no undo after this.",
+        "delete_confirm2": "❗ Last check — permanently delete \"{title}\"? There's no undo after this.",
         "delete_failed": "⚠️ Couldn't delete it: {error}",
         "btn_my_packs_back": "⬅️ My packs",
         "delete_success": "🗑️ \"{title}\" has been permanently deleted.",
         "newpack_title_prompt": "What should the pack title be?",
-        "title_empty": "That's empty -- send an actual title for the pack.",
-        "title_truncated": "Telegram caps pack titles at 64 characters -- using \"{title}\".",
+        "title_empty": "That's empty — send an actual title for the pack.",
+        "title_truncated": "Telegram caps pack titles at 64 characters — using \"{title}\".",
         "editing_intro_new": (
-            "Send images, GIFs, videos, or static/video stickers -- each one "
+            "Send images, GIFs, videos, or static/video stickers — each one "
             "is added with the default 😭 emoji. Send emoji right after to retag "
             "the last one. /done when finished."
         ),
         "no_packs_for_add": "You don't have any packs yet. Use /newpack first.",
         "pick_pack_prompt": "Which pack? Tap it, then \"➕ Add stickers\".",
         "editing_intro_add": (
-            "Send images, GIFs, videos, or static/video stickers to add -- default "
+            "Send images, GIFs, videos, or static/video stickers to add — default "
             "emoji is 😭, send emoji right after to retag the last one. /done when finished.\n\n"
             "Tip: sending a sticker that's already in this pack removes it instead of "
             "adding a duplicate."
@@ -187,21 +281,21 @@ STRINGS = {
         "btn_delete_pack_yes": "🗑️ Yes, delete the pack",
         "btn_cancel": "Cancel",
         "remove_last_confirm": (
-            "That's the only sticker left in this pack -- removing it deletes the "
+            "That's the only sticker left in this pack — removing it deletes the "
             "*whole pack* from Telegram, since packs can't be empty. Are you sure?"
         ),
         "remove_failed": "⚠️ Couldn't remove that sticker: {error}",
-        "remove_success": "🗑️ That sticker was already in this pack -- removed it.",
+        "remove_success": "🗑️ That sticker was already in this pack — removed it.",
         "keep_pack": "Okay, kept the pack as-is.",
         "pack_deleted_empty": "🗑️ Pack deleted (it had no stickers left).",
         "pack_deleted_note": "❌ Pack deleted.",
         "image_process_failed": "Couldn't process that image: {error}",
         "added_default_emoji": "Added {emoji} — send an emoji to retag it.",
-        "last_attempt_failed": "⚠️ Last attempt failed -- send another item to retry, or /cancel.",
+        "last_attempt_failed": "⚠️ Last attempt failed — send another item to retry, or /cancel.",
         "converting_video": "Converting to a video sticker...",
         "video_convert_failed_redirect": (
             "{error}\n\nCan't turn this into a sticker, but if you just want the "
-            "file in a normal format, @ConvertBot can do that -- just send the "
+            "file in a normal format, @ConvertBot can do that — just send the "
             "same file over there 👇"
         ),
         "video_convert_generic_failed": "Couldn't convert that: {error}",
@@ -210,12 +304,12 @@ STRINGS = {
             "now to retag it, another image/GIF/video to keep going, or /done to finish."
         ),
         "animated_not_supported": (
-            "Animated (Lottie/.tgs) stickers aren't supported -- send a static "
+            "Animated (Lottie/.tgs) stickers aren't supported — send a static "
             "image, a GIF/video, or a static/video sticker instead."
         ),
         "import_usage": (
             "Send /import <telegram pack link or name> to copy stickers from "
-            "another public Telegram pack into this one -- or just send a "
+            "another public Telegram pack into this one — or just send a "
             "WhatsApp sticker pack .zip/.wastickers file directly."
         ),
         "import_invalid_source": "That doesn't look like a valid pack name or t.me/addstickers link.",
@@ -225,7 +319,7 @@ STRINGS = {
         "import_summary_failed": ", {failed} failed",
         "import_summary_tail": ". Keep sending more, or /done to finish.",
         "done_standalone_hint": (
-            "Nothing to finish -- you aren't editing a pack right now. Start one "
+            "Nothing to finish — you aren't editing a pack right now. Start one "
             "with /newpack, or tap Add stickers on a pack from /mypacks."
         ),
         "import_standalone_hint": (
@@ -245,13 +339,13 @@ STRINGS = {
         ),
         "convert_redirect": (
             "File conversion (images/video/audio, not sticker-specific) moved to "
-            "@ConvertBot -- tap below to open it."
+            "@ConvertBot — tap below to open it."
         ),
         "cancelled_status_note": "❌ Cancelled.",
-        "unrecognized": "Not sure what that's for -- try /newpack, /mypacks, or /help.",
+        "unrecognized": "Not sure what that's for — try /newpack, /mypacks, or /help.",
         "unknown_command": "I don't recognize that command. Send /help to see what I can do.",
         "err_invalid_name": (
-            "⚠️ Telegram rejected the pack's internal name -- this usually happens when the "
+            "⚠️ Telegram rejected the pack's internal name — this usually happens when the "
             "title starts with a number or symbol. Send /cancel, then /newpack again with a "
             "title that starts with a letter (e.g. \"My 2007\" instead of \"2007\")."
         ),
@@ -259,11 +353,11 @@ STRINGS = {
             "⚠️ That pack's internal name collided with an existing one (rare, just bad luck). "
             "Send /cancel, then /newpack again to get a fresh one."
         ),
-        "err_too_many_stickers": "⚠️ This pack is already at Telegram's sticker limit (120) -- start a new pack with /newpack instead.",
-        "err_bad_format": "⚠️ Telegram didn't accept that file's format for this pack -- try a different image.",
+        "err_too_many_stickers": "⚠️ This pack is already at Telegram's sticker limit (120) — start a new pack with /newpack instead.",
+        "err_bad_format": "⚠️ Telegram didn't accept that file's format for this pack — try a different image.",
         "err_generic": "⚠️ Telegram rejected that: {msg}\n\nYou can try again, or /cancel to stop.",
         "err_timed_out": (
-            "⚠️ Telegram didn't confirm in time -- it may have gone through anyway, "
+            "⚠️ Telegram didn't confirm in time — it may have gone through anyway, "
             "so check the pack before retrying to avoid a duplicate. You can try "
             "again, or /cancel to stop."
         ),
@@ -277,20 +371,20 @@ STRINGS = {
             "be converted. Install it with 'apt install ffmpeg' (Linux), "
             "'brew install ffmpeg' (Mac), or add a Windows build to PATH."
         ),
-        "video_convert_empty_file": "That file came through empty -- try sending it again.",
+        "video_convert_empty_file": "That file came through empty — try sending it again.",
         "video_convert_too_big": (
             "Couldn't compress this clip under Telegram's 256 KB video-sticker "
             "limit ({note}). Try a shorter or visually simpler clip."
         ),
         "import_pack_not_found": (
-            "Couldn't find a sticker pack called \"{source}\" -- double-check "
+            "Couldn't find a sticker pack called \"{source}\" — double-check "
             "the link/name (it must be public)."
         ),
         "import_bad_zip": "That doesn't look like a valid .zip/.wastickers file.",
         "import_zip_no_images": "No usable images found inside that zip.",
     },
     "uz": {
-        "flood_wait": "Siz men ulgurganimdan tezroq yuboryapsiz -- taxminan {seconds} soniya kutib, davom eting.",
+        "flood_wait": "Siz men ulgurganimdan tezroq yuboryapsiz — taxminan {seconds} soniya kutib, davom eting.",
         "sibling_blurb": "Bu bot oilasining bir qismi, pastda ko'ring \U0001f447",
         "donation_nudge": (
             "💙 Agar bu bot foydali bo'lgan bo'lsa: hosting/API xarajatlarini uni ishga "
@@ -317,11 +411,113 @@ STRINGS = {
         "donate_custom_ask": "Nechta {unit} xayriya qilmoqchisiz? Raqam bilan javob bering.",
         "donate_invalid_amount_retry": "Bu noto'g'ri miqdor — qayta urinish uchun /donate yuboring.",
         "donate_thanks": "🙏 {amount} ⭐ uchun rahmat — bu chindan ham qadrlanadi!",
+        "bot_short_description": (
+            "Rasm, GIF va videolardan Telegram stiker to'plamlarini yasaydi."
+        ),
+        "bot_description": (
+            "Rasm, GIF yoki video yuboring — bot undan o'zingizga tegishli stiker to'plamini "
+            "yig'adi.\n"
+            "\n"
+            "To'plamni boshqa birov ham to'ldira olishi uchun havolasini ulashing yoki boshqa "
+            "Telegram to'plamidan hamda WhatsApp arxividan ko'chirib oling.\n"
+            "\n"
+            "Ingliz, o'zbek va rus tillarida. /privacy nima saqlanishini aytadi."
+        ),
+        # ---- shared policy keys (/privacy, /terms, /deletemydata) ----
+        "privacy_heading": "🔒 Maxfiylik",
+        "privacy_kept_heading": "Bu bot nimalarni saqlaydi:",
+        "privacy_stored": (
+            "• Telegram foydalanuvchi raqamingiz va tanlagan tilingiz\n"
+            "• shu yerda yasagan to'plamlaringiz: har birining nomi va sarlavhasi, o'sha paytdagi "
+            "ismingiz va foydalanuvchi nomingiz\n"
+            "• to'plamga kimga qo'shish huquqini berganingiz va yaratgan havolalaringiz\n"
+            "• botdan har foydalanganingizda vaqt belgisi — egasi umuman kimdir "
+            "foydalanayotganini bilishi uchun\n"
+            "• xayriya qilsangiz, uning yozuvi: miqdori va Telegramning to'lov raqami\n"
+            "• bot siz bilan boshlagan ish tugagunicha uning holati"
+        ),
+        "privacy_seen_by_heading": "Yana kim ko'radi:",
+        "privacy_seen_by": (
+            "• Telegram — har bir xabarni ikki tomonga ham u tashiydi va o'z shartlarini o'zi "
+            "belgilaydi\n"
+            "• bot ishlab turgan hosting va u yozadigan ma'lumotlar bazasi"
+        ),
+        "privacy_others": (
+            "• bulardan boshqa hech kim — stikerlar bot ishlab turgan kompyuterda tayyorlanadi, tashqi "
+            "xizmatga murojaat qilinmaydi"
+        ),
+        "privacy_kept_for_heading": "Qancha vaqt saqlanadi:",
+        "privacy_kept_for": (
+            "Sozlamalar va bot siz uchun ushlab turgan narsalar siz o'chirmaguningizcha yoki "
+            "botdan foydalanishni to'xtatmaguningizcha qoladi. Foydalanish belgilari taxminan uch "
+            "oydan keyin o'chiriladi. To'lov yozuvlari uzoqroq saqlanadi, chunki pulni qaytarish "
+            "o'shalar asosida amalga oshiriladi.\n"
+            "\n"
+            "Bu yerdagi hech narsa sotilmaydi, ijaraga berilmaydi va reklama uchun ishlatilmaydi; "
+            "yuqorida sanab o'tilmagan hech kimga hech narsa berilmaydi."
+        ),
+        "privacy_your_choices": (
+            "Nima qila olasiz:\n"
+            "/deletemydata — bot siz haqingizda saqlaganini o'chirish\n"
+            "/terms — botdan nima uchun foydalanish mumkinligi\n"
+            "\n"
+            "Telegramda botni bloklash uni siz bilan gaplashishdan to'xtatadi, lekin hech narsani "
+            "o'chirmaydi — ikkalasi ham kerak bo'lsa, avval /deletemydata yuboring."
+        ),
+        "terms_heading": "📜 Shartlar",
+        "terms_use": (
+            "Botdan o'z maqsadi bo'yicha, qonun va Telegram shartlari doirasida foydalaning. Uni "
+            "birovni bezovta qilish uchun ishlatmang va u belgilagan cheklovlardan oshirib "
+            "yuklamang — bunday akkaunt bloklanadi."
+        ),
+        "terms_specific": (
+            "Stikerlar haqida: faqat o'zingizga tegishli narsani yuklang. Birovning ishidan "
+            "ruxsatsiz to'plam yasamang va Telegram shartlari taqiqlagan narsalardan to'plam "
+            "qilmang. To'plam yaratilgach Telegramda yashaydi — bu bot uni unutishi mumkin, "
+            "lekin o'chirishni faqat egasi, Telegram orqali qiladi."
+        ),
+        "terms_money": (
+            "Pul haqida: /donate ixtiyoriy va hech narsa sotib olmaydi — u botni ishlatish "
+            "xarajatlariga ketadi. Har bir to'lovni Telegram amalga oshiradi, bot karta raqamini "
+            "hech qachon ko'rmaydi. Adashib yuborsangiz, aytsangiz qaytariladi."
+        ),
+        "terms_no_warranty": (
+            "Va'da yo'q: buni bir kishi olib boradi, u bepul, va ogohlantirishsiz sekinlashishi, "
+            "xato qilishi yoki umuman o'chib qolishi mumkin. Siz uchun muhim narsaning nusxasini "
+            "o'zingizda saqlang."
+        ),
+        "policy_full_text": "To'liq matn: {url}",
+        "policy_contact": "Savollar, shikoyatlar yoki ma'lumot so'rovi: {contact}",
+        "delete_data_confirm": (
+            "⚠️ Bu bot siz haqingizda saqlagan narsalarni o'chiradi. Ortga qaytarib bo'lmaydi."
+        ),
+        "delete_data_consequences": (
+            "Bot siz shu yerda yasagan to'plamlarni unutadi: ularni ro'yxatda ko'rsatmaydi va "
+            "ularga yangi stiker qo'sha olmaydi. To'plamlarning o'zi o'rnatgan hammada "
+            "ishlayveradi — ularni butunlay o'chirishni Telegram orqali o'zingiz qilasiz. "
+            "Tilingiz, havolalaringiz va to'plamlaringizga berilgan qo'shish huquqlari ham "
+            "ketadi.\n"
+            "\n"
+            "Xayriya yozuvlari foydalanuvchi nomingizsiz qoladi, chunki pulni qaytarish o'shalar "
+            "asosida qilinadi."
+        ),
+        "delete_data_button_yes": "🗑 O'chirilsin",
+        "delete_data_button_no": "↩️ Ma'lumotlarim qolsin",
+        "delete_data_kept": "Hech narsa o'chirilmadi.",
+        "delete_data_done": (
+            "🗑 Bajarildi — {rows} ta yozuv o'chirildi.\n"
+            "\n"
+            "Istalgan payt /start yuboring; bot sizni yangi foydalanuvchi sifatida qabul qiladi."
+        ),
+        "delete_data_failed": (
+            "Hozir o'chira olmadim — mening tomonimda nimadir noto'g'ri ketdi. Bir necha "
+            "daqiqadan keyin qayta urinib ko'ring."
+        ),
         "language_set_confirmation": "✅ Til o'zbekchaga o'zgartirildi.",
         "cancel_header": "\u274c Bekor qilindi:",
-        "cancel_nothing": "Bekor qiladigan narsa yo'q -- men sizdan hech narsa kutmayotgan edim.",
+        "cancel_nothing": "Bekor qiladigan narsa yo'q — men sizdan hech narsa kutmayotgan edim.",
         "cancel_ask": "Nimani to'xtatay? Mana, men nimalarni kutyapman:",
-        "cancel_kept": "Yaxshi -- hech narsa bekor qilinmadi.",
+        "cancel_kept": "Yaxshi — hech narsa bekor qilinmadi.",
         "cancel_reply_box_freed": "Javob yozish oynasi yana bo'sh.",
         "cancel_button_all": "❌ Hammasini",
         "cancel_button_none": "↩️ Hech narsani, davom etamiz",
@@ -362,8 +558,6 @@ STRINGS = {
             "marta so'raladi).\n\n"
             "Instagram/TikTok'dan video olishni yoki faylni boshqa formatga aylantirishni "
             "xohlaysizmi? Ular endi quyidagi qarindosh botlarda joylashgan.\n\n"
-            "Bu bot hali ishlab chiqilmoqda va vaqtinchalik joylashtirilgan. Agar javob "
-            "bermasa, biroz kuting — men uni qayta ishga tushirganimda odatda o'zi qaytadi.\n\n"
         ),
         "whomade_usage": "Foydalanish: /whomade <to'plam nomi yoki t.me/addstickers havolasi>",
         "whomade_not_found": (
@@ -490,7 +684,7 @@ STRINGS = {
         "import_summary_failed": ", {failed} tasi muvaffaqiyatsiz tugadi",
         "import_summary_tail": ". Davom etish uchun yana yuboraversangiz bo'ladi, yoki tugatish uchun /done ni bosing.",
         "done_standalone_hint": (
-            "Tugatadigan narsa yo'q -- hozir hech qanday to'plamni tahrirlamayapsiz. "
+            "Tugatadigan narsa yo'q — hozir hech qanday to'plamni tahrirlamayapsiz. "
             "/newpack bilan yangisini boshlang yoki /mypacks dagi to'plamda "
             "\"Stiker qo'shish\"ni bosing."
         ),
@@ -559,7 +753,7 @@ STRINGS = {
         "import_zip_no_images": "Bu zip ichida ishlatsa bo'ladigan rasm topilmadi.",
     },
     "ru": {
-        "flood_wait": "Ты отправляешь быстрее, чем я успеваю -- подожди примерно {seconds} секунд(ы) и продолжай.",
+        "flood_wait": "Ты отправляешь быстрее, чем я успеваю — подожди примерно {seconds} секунд(ы) и продолжай.",
         "sibling_blurb": "Тоже часть этой семьи ботов, смотри ниже \U0001f447",
         "donation_nudge": (
             "💙 Если этот бот оказался полезным: расходы на хостинг/API покрывает тот, "
@@ -585,11 +779,107 @@ STRINGS = {
         "donate_custom_ask": "Сколько {unit} вы хотите пожертвовать? Ответьте числом.",
         "donate_invalid_amount_retry": "Это некорректная сумма — отправьте /donate, чтобы попробовать снова.",
         "donate_thanks": "🙏 Спасибо за {amount} ⭐ — это по-настоящему ценно!",
+        "bot_short_description": (
+            "Делает стикерпаки из картинок, GIF и видео."
+        ),
+        "bot_description": (
+            "Пришли картинку, GIF или видео — бот соберёт из этого стикерпак, который принадлежит "
+            "тебе.\n"
+            "\n"
+            "Дай ссылку, чтобы паком мог пополнять кто-то ещё, или перенеси стикеры из другого "
+            "пака Telegram либо из архива WhatsApp.\n"
+            "\n"
+            "Английский, узбекский и русский. /privacy — что бот о тебе хранит."
+        ),
+        # ---- shared policy keys (/privacy, /terms, /deletemydata) ----
+        "privacy_heading": "🔒 Конфиденциальность",
+        "privacy_kept_heading": "Что бот хранит:",
+        "privacy_stored": (
+            "• твой числовой id в Telegram и выбранный язык\n"
+            "• паки, которые ты здесь собрал: имя и название каждого, а также имя и username, "
+            "которые были у тебя в тот момент\n"
+            "• кому ты дал доступ на добавление в пак и какие ссылки создал\n"
+            "• отметку времени на каждое обращение к боту — чтобы владелец видел, пользуется ли "
+            "ботом хоть кто-нибудь\n"
+            "• запись о пожертвовании: сумму и платёжный id Telegram\n"
+            "• то, что бот в этот момент для тебя делает — пока не закончит"
+        ),
+        "privacy_seen_by_heading": "Кто ещё это видит:",
+        "privacy_seen_by": (
+            "• Telegram — он передаёт каждое сообщение в обе стороны и действует по своим "
+            "правилам\n"
+            "• хостинг, на котором работает бот, и база данных, в которую он пишет"
+        ),
+        "privacy_others": (
+            "• и больше никто, кроме них — стикеры делаются на той же машине, где работает бот, и никакие "
+            "внешние сервисы не вызываются"
+        ),
+        "privacy_kept_for_heading": "Сколько это хранится:",
+        "privacy_kept_for": (
+            "Настройки и всё, что бот держит для тебя, остаются, пока ты их не сотрёшь или не "
+            "перестанешь пользоваться ботом. Отметки об использовании удаляются примерно через "
+            "три месяца. Записи о платежах хранятся дольше — по ним делается возврат.\n"
+            "\n"
+            "Ничего из этого не продаётся, не сдаётся в аренду и не используется для рекламы, и "
+            "никому кроме перечисленных выше не передаётся."
+        ),
+        "privacy_your_choices": (
+            "Что можно сделать:\n"
+            "/deletemydata — стереть всё, что бот хранит о тебе\n"
+            "/terms — для чего ботом можно пользоваться\n"
+            "\n"
+            "Блокировка бота в Telegram остановит его сообщения, но ничего не сотрёт — если "
+            "нужно и то и другое, сначала отправь /deletemydata."
+        ),
+        "terms_heading": "📜 Условия",
+        "terms_use": (
+            "Пользуйся ботом по назначению, в рамках закона и правил самого Telegram. Не "
+            "используй его, чтобы кого-то донимать, и не нагружай сверх заданных лимитов — за то "
+            "и другое аккаунт блокируется."
+        ),
+        "terms_specific": (
+            "О стикерах: загружай то, что можешь загружать. Не собирай паки из чужих работ без "
+            "разрешения и не делай паков из того, что запрещено правилами самого Telegram. "
+            "Созданный пак живёт в Telegram — бот может о нём забыть, но удалить его может "
+            "только владелец и только через Telegram."
+        ),
+        "terms_money": (
+            "О деньгах: /donate — дело добровольное и ничего не покупает: деньги идут на то, во "
+            "что бот обходится. Все платежи проводит Telegram, бот никогда не видит номер карты. "
+            "Отправил по ошибке — скажи, и вернём."
+        ),
+        "terms_no_warranty": (
+            "Без обещаний: бота ведёт один человек, он бесплатный и может тормозить, ошибаться "
+            "или вовсе не работать без предупреждения. Держи свою копию всего, что тебе важно."
+        ),
+        "policy_full_text": "Полный текст: {url}",
+        "policy_contact": "Вопросы, жалобы или запрос по данным: {contact}",
+        "delete_data_confirm": "⚠️ Это сотрёт всё, что бот хранит о тебе. Отменить будет нельзя.",
+        "delete_data_consequences": (
+            "Бот забудет паки, которые ты через него собрал: перестанет их показывать и не сможет "
+            "в них ничего добавить. Сами паки продолжат работать у всех, кто их установил — по- "
+            "настоящему удалить пак можно только самому, через Telegram. Язык, твои ссылки и "
+            "чужой доступ на добавление в твои паки тоже пропадут.\n"
+            "\n"
+            "Записи о пожертвованиях останутся, без username, потому что по ним делается возврат."
+        ),
+        "delete_data_button_yes": "🗑 Стереть",
+        "delete_data_button_no": "↩️ Оставить мои данные",
+        "delete_data_kept": "Ничего не стёрто.",
+        "delete_data_done": (
+            "🗑 Готово — стёрто записей: {rows}.\n"
+            "\n"
+            "Отправь /start когда захочешь; бот примет тебя как нового."
+        ),
+        "delete_data_failed": (
+            "Сейчас стереть не получилось — что-то сломалось на моей стороне. Попробуй ещё раз "
+            "через несколько минут."
+        ),
         "language_set_confirmation": "✅ Язык изменён на русский.",
         "cancel_header": "\u274c \u041e\u0442\u043c\u0435\u043d\u0435\u043d\u043e:",
-        "cancel_nothing": "\u041e\u0442\u043c\u0435\u043d\u044f\u0442\u044c \u043d\u0435\u0447\u0435\u0433\u043e -- \u044f \u043d\u0438\u0447\u0435\u0433\u043e \u043e\u0442 \u0432\u0430\u0441 \u043d\u0435 \u0436\u0434\u0430\u043b.",
+        "cancel_nothing": "\u041e\u0442\u043c\u0435\u043d\u044f\u0442\u044c \u043d\u0435\u0447\u0435\u0433\u043e — \u044f \u043d\u0438\u0447\u0435\u0433\u043e \u043e\u0442 \u0432\u0430\u0441 \u043d\u0435 \u0436\u0434\u0430\u043b.",
         "cancel_ask": "Что остановить? Вот что я жду:",
-        "cancel_kept": "Хорошо -- ничего не отменено.",
+        "cancel_kept": "Хорошо — ничего не отменено.",
         "cancel_reply_box_freed": "Поле ответа снова свободно.",
         "cancel_button_all": "❌ Всё",
         "cancel_button_none": "↩️ Ничего, продолжаем",
@@ -629,9 +919,6 @@ STRINGS = {
             "удалить его насовсем (только для владельца, дважды спрашивает перед этим).\n\n"
             "Хотите скачать видео из Instagram/TikTok или сконвертировать файл в "
             "другой формат? Теперь это делают соседние боты ниже.\n\n"
-            "Этот бот всё ещё находится в разработке и размещён временно. Если он не "
-            "отвечает, подождите — обычно он снова заработает, когда я запущу его в "
-            "следующий раз.\n\n"
         ),
         "whomade_usage": "Использование: /whomade <имя набора или ссылка t.me/addstickers>",
         "whomade_not_found": (
@@ -756,7 +1043,7 @@ STRINGS = {
         "import_summary_failed": ", {failed} не удалось",
         "import_summary_tail": ". Можете отправлять ещё, или /done, чтобы закончить.",
         "done_standalone_hint": (
-            "Нечего завершать -- сейчас вы не редактируете набор. "
+            "Нечего завершать — сейчас вы не редактируете набор. "
             "Начните новый через /newpack или нажмите «Добавить стикеры» "
             "на наборе из /mypacks."
         ),

@@ -738,6 +738,54 @@ def prune_old_data() -> int:
         conn.commit()
     return removed
 
+# ---------- erasing one person, on request ----------
+# What /deletemydata reaches -- see shared_features.py, which owns the
+# command and the confirmation. Everything in this schema that is about one
+# person goes, in a single transaction, with one deliberate exception.
+#
+# The Stars ledger keeps its rows. A donation is a payment, and a payment
+# record has to outlive the payer asking to be forgotten: it is what a refund
+# is issued against and what the totals are counted from. The username is
+# cleared, since it is the one free-text identifier on the row; the numeric
+# id stays, because without it a refund cannot be sent to anybody. The
+# privacy notice says so rather than implying the erase is total.
+
+def erase_user(user_id: int) -> int:
+    """Returns how many rows were removed. Blocking; call through
+    asyncio.to_thread.
+
+    The sticker packs themselves are not ours to delete. They live on
+    Telegram's servers under this bot's name, and dropping the rows here
+    makes the bot forget them -- it stops listing them and can no longer add
+    to them -- while every copy anyone installed keeps working. Removing a
+    pack for real is done from Telegram, by its owner.
+    """
+    removed = 0
+    with pooled() as conn:
+        cur = conn.execute("SELECT name FROM packs WHERE user_id = %s", (user_id,))
+        owned = [row[0] for row in cur.fetchall()]
+        if owned:
+            for table in ("pack_share_tokens", "pack_editors"):
+                cur = conn.execute(f"DELETE FROM {table} WHERE pack_name = ANY(%s)", (owned,))
+                removed += cur.rowcount or 0
+            cur = conn.execute("DELETE FROM packs WHERE user_id = %s", (user_id,))
+            removed += cur.rowcount or 0
+        # Their seat on somebody else's pack, which is theirs to give up and
+        # takes nothing of the owner's with it.
+        cur = conn.execute("DELETE FROM pack_editors WHERE user_id = %s", (user_id,))
+        removed += cur.rowcount or 0
+        for table in ("user_settings", "donation_prompts", "activity_events"):
+            cur = conn.execute(f"DELETE FROM {table} WHERE user_id = %s", (user_id,))
+            removed += cur.rowcount or 0
+        conn.execute(
+            "UPDATE star_transactions SET username = NULL "
+            "WHERE user_id = %s AND username IS NOT NULL",
+            (user_id,),
+        )
+        conn.commit()
+    return removed
+
+
 # ---------- admin: full database export ----------
 
 def dump_database_csv_zip() -> bytes:
