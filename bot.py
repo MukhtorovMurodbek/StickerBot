@@ -108,6 +108,7 @@ from import_utils import (
 )
 from shared_features import (
     publish_profile,
+    publish_commands,
     ERASE_PREFIX,
     delete_my_data_chosen,
     delete_my_data_command,
@@ -210,6 +211,19 @@ BOT_COMMANDS = [
     BotCommand("privacy", "What this bot keeps about you"),
     BotCommand("terms", "What this bot may be used for"),
     BotCommand("deletemydata", "Erase what this bot holds on you"),
+]
+
+# The same menu, in the owner's own chat, with the commands only they can
+# run. Kept out of BOT_COMMANDS on purpose -- a stranger should not be offered
+# /dbdump -- but hidden from the owner too, which was the accident. See
+# publish_commands() in shared_features.py. English, like the rest of the
+# admin output: the only person who sees this list wrote the bot.
+ADMIN_COMMANDS = [
+    BotCommand("status", "🔒 Uptime, host, errors, active users"),
+    BotCommand("whois", "🔒 whois <user_id> — a user, and their packs"),
+    BotCommand("messageas", "🔒 messageas <user_id> <text> — DM as this bot"),
+    BotCommand("dbdump", "🔒 This bot's tables as a zip of CSVs"),
+    BotCommand("crashtest", "🔒 Raise on purpose, to check the alert arrives"),
 ]
 
 # ---------- small helpers ----------
@@ -1677,7 +1691,7 @@ async def _post_init(application):
     # replacing is still polling, two processes would be splitting this
     # bot's updates between them and getting 409 Conflict for their trouble.
     await lifecycle.on_start(BOT_NAME)
-    await application.bot.set_my_commands(BOT_COMMANDS)
+    await publish_commands(application, BOT_COMMANDS, ADMIN_COMMANDS, ADMIN_IDS)
     await publish_profile(application)
 
 
