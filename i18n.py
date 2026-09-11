@@ -53,14 +53,39 @@ STRINGS = {
         "donate_custom_button": "✏️ Custom {symbol}",
         "donate_too_many_stars": "That's a lot of stars! Keep it under {max} ⭐ per donation.",
         "donate_out_of_range": "{currency} donations need to be between {lo} and {hi} {symbol}.",
-        "donate_invoice_title": "Buy the bot a coffee ☕",
-        "donate_invoice_description": "A one-time voluntary donation towards hosting costs. Thank you!",
-        "donate_invoice_label": "Donation",
+        "donate_invoice_title": "Contribute to hosting",
+        "donate_invoice_description": "Goes towards what this bot costs to run, and adds {credited} ⚡ of credit to your balance for conversions in ConvertBot.",
+        "donate_invoice_label": "Hosting contribution",
+        "donate_invoice_description_fiat": 'A one-time voluntary donation towards hosting costs. Thank you!',
+        "donate_prompt_credit": 'Stars you pay become ⚡ credit for conversions in ConvertBot. Your next {left} ⭐ earn {each} ⚡ each ({mult}×): {rate} ⚡ of ordinary credit plus a bonus that expires {days} days after payment. ⚡ can NOT be withdrawn or turned back into Stars.',
+        "donate_prompt_credit_base": 'Stars you pay become ⚡ credit for conversions in ConvertBot, {rate} ⚡ per ⭐. ⚡ can NOT be withdrawn or turned back into Stars.',
         "donate_invoice_error": "⚠️ Telegram wouldn't create that invoice: {error}",
         "stars_unit": "Stars",
         "donate_custom_ask": "How many {unit} would you like to donate? Reply with a number.",
         "donate_invalid_amount_retry": "That's not a valid amount — send /donate to try again.",
         "donate_thanks": "🙏 Thank you for the {amount} ⭐ — genuinely appreciated!",
+        "topup_thanks": "🙏 Thank you for donating {stars} ⭐ — it helps keep the bots running.\n\nAs a thank-you, you've received {total} ⚡ of credit in {convert_bot} to use on file conversions. Your credit there: {balance} ⚡.",
+        "topup_thanks_bonus": 'Of that, {bonus} ⚡ is bonus credit and expires on {date}.',
+        "credit_cannot_be_withdrawn": '⚡ is credit for conversions in ConvertBot, and can NOT be withdrawn or turned back into Stars. A problem with a payment? /paysupport',
+        "paysupport_text": '💳 Help with a payment\n\nPayments are FINAL: Stars are NOT refunded, and ⚡ credit can NOT be withdrawn or turned back into Stars.\n\nIf a payment went wrong — you were charged and no credit arrived, or you were charged twice — write to {contact} with the date, the amount and your Telegram id, {user_id}. It will be checked and put right with credit.\n\n/balance lists every payment and what it added.',
+        "report_button": '🐞 Report the issue',
+        "report_disclaimer": "📨 Send a report about this problem to the bot's owner?\n\nWhat is sent: the bot's name, the error code {code}, the incident number {incident}, when it happened and the bot's version.\n\nNo personal info is sent.",
+        "report_send": '📨 Send report',
+        "report_cancel": '✖️ Cancel',
+        "report_sent": '✅ Report sent — thank you. It helps get this fixed.',
+        "report_already": 'This report has already been sent.',
+        "report_cancelled": 'Report cancelled — nothing was sent.',
+        "report_failed": "⚠️ The report couldn't be sent right now. Please try again later.",
+        "report_invalid": 'This button no longer works.',
+        "crash_notice": "⚠️ Something went wrong on the bot's side while handling that, so it wasn't done. Please try again in a moment.",
+        "sandbox_notice": "🧪 Test mode — no real Stars were charged for this.",
+        "balance_header": "⚡ Your balance: {balance}",
+        "balance_totals": "Paid {paid} ⭐ in total · credited {credited} ⚡ · spent {spent} ⚡",
+        "balance_rate": 'Your next {left} ⭐ earn {each} ⚡ each ({mult}×).',
+        "balance_rate_base": '1 ⭐ buys {rate} ⚡.',
+        "balance_bonus_line": 'Of that, {bonus} ⚡ is bonus credit — {soon} ⚡ of it expires on {date}.',
+        "balance_recent": "Recent:",
+        "balance_empty_hint": "/donate adds credit whenever you want some.",
         "bot_short_description": (
             "Turns images, GIFs and videos into Telegram sticker packs."
         ),
@@ -96,14 +121,7 @@ STRINGS = {
             "service is called"
         ),
         "privacy_kept_for_heading": "How long it stays:",
-        "privacy_kept_for": (
-            "Settings and anything the bot is holding for you stay until you erase them or stop "
-            "using it. Counted use is dropped after about three months. Payment records are kept "
-            "longer, because refunds are issued against them.\n"
-            "\n"
-            "Nothing here is sold, rented or used for advertising, and nothing goes to anyone not "
-            "named above."
-        ),
+        "privacy_kept_for": 'Settings and anything the bot is holding for you stay until you erase them or stop using it. Counted use is dropped after about three months. Payment records and your ⚡ balance are kept longer, because a dispute about a payment is settled against them.\n\nNothing here is sold, rented or used for advertising, and nothing goes to anyone not named above.',
         "privacy_your_choices": (
             "What you can do:\n"
             "/deletemydata — erase what this bot holds on you\n"
@@ -124,11 +142,7 @@ STRINGS = {
             "terms forbid. A pack lives on Telegram once it exists — this bot can forget one, "
             "but only its owner can delete it, from Telegram."
         ),
-        "terms_money": (
-            "Money: /donate is voluntary and buys nothing at all — it goes towards what the bot "
-            "costs to run. Telegram handles every payment and the bot never sees a card number. "
-            "Send one by mistake and it comes back if you ask."
-        ),
+        "terms_money": 'Money: /donate is voluntary and goes towards what the bots cost to run. A payment in Stars also adds ⚡ credit for conversions in ConvertBot: 2 ⚡ per ⭐, or 6 for your first 500 Stars ever and 4 for the next 500. The part above 2 is bonus credit and expires 90 days after the payment. Payments are FINAL: Stars are NOT refunded, and credit can NOT be withdrawn or turned back into Stars. Telegram handles every payment and the bot never sees a card number. A payment that went wrong: /paysupport.',
         "terms_no_warranty": (
             "No promises: one person runs this, it is free, and it can be slow, wrong, or off "
             "entirely without warning. Keep your own copy of anything that matters."
@@ -136,15 +150,7 @@ STRINGS = {
         "policy_full_text": "Full text: {url}",
         "policy_contact": "Questions, complaints or a data request: {contact}",
         "delete_data_confirm": "⚠️ This erases what this bot holds on you. There is no undo.",
-        "delete_data_consequences": (
-            "The bot forgets the packs you made through it: it stops listing them and can no "
-            "longer add to them. The packs themselves keep working for everyone who installed "
-            "them — deleting one for real is done from Telegram, by you. Your language, your "
-            "share links and anyone's add-access to your packs go as well.\n"
-            "\n"
-            "Donation records stay, without your username, because refunds are issued against "
-            "them."
-        ),
+        "delete_data_consequences": "The bot forgets the packs you made through it: it stops listing them and can no longer add to them. The packs themselves keep working for everyone who installed them — deleting one for real is done from Telegram, by you. Your language, your share links and anyone's add-access to your packs go as well.\n\nDonation records stay, without your username, because a dispute about a payment is settled against them. Your ⚡ balance stays too, and is still yours if you come back.",
         "delete_data_button_yes": "🗑 Erase it",
         "delete_data_button_no": "↩️ Keep my data",
         "delete_data_kept": "Nothing was erased.",
@@ -179,27 +185,7 @@ STRINGS = {
             "Hey! I turn your images/GIFs/videos/stickers into Telegram sticker "
             "packs, and I can grab videos from Instagram/TikTok links.\n\n"
         ),
-        "help_text": (
-            "Commands:\n"
-            "/newpack - start a new sticker pack\n"
-            "/addsticker - add stickers to an existing pack\n"
-            "/mypacks - list your packs\n"
-            "/import <pack link/name> - (while editing) bulk-copy stickers from another "
-            "Telegram pack, or send a WhatsApp sticker pack .zip/.wastickers file\n"
-            "/done - finish editing a pack\n"
-            "/cancel - stop something I'm waiting on you for (I'll ask which)\n"
-            "/whomade <pack link/name> - see who created a pack (if made through this bot)\n"
-            "/donate - chip in for hosting costs (totally optional)\n"
-            "/en, /uz, /rus - switch language (or /language, which asks)\n\n"
-            "While editing a pack: send images, GIFs, videos, or static/video "
-            "stickers to add them.\n"
-            "Send emoji after one to tag it with that emoji.\n\n"
-            "Tap a pack from /mypacks to rename it, set up co-editing so someone else "
-            "can add stickers to it too, or delete it for good (owner-only, asks "
-            "twice before it actually happens).\n\n"
-            "Want to grab a video from Instagram/TikTok, or convert a file to another "
-            "format? Those live in the sibling bots below now.\n\n"
-        ),
+        "help_text": "Commands:\n/newpack - start a new sticker pack\n/addsticker - add stickers to an existing pack\n/mypacks - list your packs\n/import <pack link/name> - (while editing) bulk-copy stickers from another Telegram pack, or send a WhatsApp sticker pack .zip/.wastickers file\n/done - finish editing a pack\n/cancel - stop something I'm waiting on you for (I'll ask which)\n/whomade <pack link/name> - see who created a pack (if made through this bot)\n/donate - chip in for hosting costs (totally optional)\n/en, /uz, /rus - switch language (or /language, which asks)\n\nWhile editing a pack: send images, GIFs, videos, or static/video stickers to add them.\nSend emoji after one to tag it with that emoji.\n\nTap a pack from /mypacks to rename it, set up co-editing so someone else can add stickers to it too, or delete it for good (owner-only, asks twice before it actually happens).\n\nWant to grab a video from Instagram/TikTok, or convert a file to another format? Those live in the sibling bots below now.\n\n⚠️ NOTE: Payments are final — Stars paid through /donate are NOT refunded, and the ⚡ credit they add can NOT be withdrawn.\n\n",
         "whomade_usage": "Usage: /whomade <pack name or t.me/addstickers link>",
         "whomade_not_found": (
             "I don't have a record of that pack — either it wasn't created "
@@ -384,33 +370,49 @@ STRINGS = {
         "import_zip_no_images": "No usable images found inside that zip.",
     },
     "uz": {
-        "flood_wait": "Siz men ulgurganimdan tezroq yuboryapsiz — taxminan {seconds} soniya kutib, davom eting.",
-        "sibling_blurb": "Bu bot oilasining bir qismi, pastda ko'ring \U0001f447",
-        "donation_nudge": (
-            "💙 Agar bu bot foydali bo'lgan bo'lsa: hosting/API xarajatlarini uni ishga "
-            "tushirgan kishi qoplaydi, /donate esa uni tirik saqlashga yordam berishning "
-            "ixtiyoriy usuli. Bosim yo'q, xohlasangiz ham, xohlamasangiz ham!"
-        ),
-        "donate_unknown_currency": '"{currency}" — noma\'lum valyuta. xtr yoki usd dan foydalaning.',
-        "donate_currency_not_configured": "{currency} orqali xayriya bu botda hali sozlanmagan — Stars dan foydalaning.",
-        "donate_invalid_amount": "Bu noto'g'ri miqdor — masalan, /donate 500 yoki /donate 5 usd deb yozing.",
-        "donate_prompt": (
-            "Hissa qo'shganingiz uchun rahmat — bu mablag' to'g'ridan-to'g'ri "
-            "botning hosting va API xarajatlariga sarflanadi. Quyidan miqdorni "
-            "tanlang yoki o'zingiz kiritish uchun \"Boshqa\"ni bosing (shuningdek, "
-            "to'g'ridan-to'g'ri /donate <son> [usd] deb yuborishingiz mumkin)."
-        ),
+        "flood_wait": 'Juda tez yuboryapsiz — {seconds} soniyacha kutib, keyin davom eting.',
+        "sibling_blurb": 'Oilamizdagi boshqa botlar pastda 👇',
+        "donation_nudge": "💙 Bot sizga foydali bo'lgan bo'lsa: server va API xarajatlarini botni yuritayotgan odam o'z hisobidan qoplaydi. /donate orqali bunga hissa qo'shishingiz mumkin — bu mutlaqo ixtiyoriy.",
+        "donate_unknown_currency": '"{currency}" degan valyuta yo\'q — xtr yoki usd deb yozing.',
+        "donate_currency_not_configured": "Bu botda hozircha {currency} bilan xayriya qilib bo'lmaydi — Stars'dan foydalaning.",
+        "donate_invalid_amount": "Miqdor noto'g'ri — masalan, /donate 500 yoki /donate 5 usd deb yozing.",
+        "donate_prompt": "Hissangiz uchun rahmat — u to'g'ridan-to'g'ri botning server va API xarajatlariga ketadi. Quyidagi miqdorlardan birini tanlang yoki o'zingiz yozish uchun «Boshqa»ni bosing (/donate <son> [usd] deb ham yuborishingiz mumkin).",
         "donate_custom_button": "✏️ Boshqa {symbol}",
-        "donate_too_many_stars": "Bu juda ko'p yulduzcha! Har bir xayriya {max} ⭐ dan kam bo'lsin.",
-        "donate_out_of_range": "{currency} xayriyalar {lo} va {hi} {symbol} oralig'ida bo'lishi kerak.",
-        "donate_invoice_title": "Botga bir chashka qahva sotib oling ☕",
-        "donate_invoice_description": "Hosting xarajatlariga bir martalik ixtiyoriy xayriya. Rahmat!",
-        "donate_invoice_label": "Xayriya",
-        "donate_invoice_error": "⚠️ Telegram bu hisob-fakturani yarata olmadi: {error}",
+        "donate_too_many_stars": "Bu juda ko'p! Bir martalik xayriya {max} ⭐ dan oshmasin.",
+        "donate_out_of_range": "{currency} bilan xayriya {lo} dan {hi} {symbol} gacha bo'lishi kerak.",
+        "donate_invoice_title": 'Server xarajatlariga hissa',
+        "donate_invoice_description": "Botlar xarajatlariga ketadi va ConvertBot'dagi konvertatsiyalar uchun balansingizga {credited} ⚡ kredit qo'shadi.",
+        "donate_invoice_label": 'Xayriya',
+        "donate_invoice_description_fiat": 'Server xarajatlari uchun bir martalik ixtiyoriy xayriya. Rahmat!',
+        "donate_prompt_credit": "To'lagan Stars'ingiz ConvertBot'da konvertatsiyalarga sarflanadigan ⚡ kreditga aylanadi. Keyingi {left} ⭐ ning har biri {each} ⚡ beradi ({mult}×): {rate} ⚡ oddiy kredit, qolgani esa to'lovdan {days} kun o'tgach muddati tugaydigan bonus. ⚡ ni yechib olib ham, Stars'ga aylantirib ham BO'LMAYDI.",
+        "donate_prompt_credit_base": "To'lagan har bir ⭐ ConvertBot'da konvertatsiyalarga sarflanadigan {rate} ⚡ kreditga aylanadi. ⚡ ni yechib olib ham, Stars'ga aylantirib ham BO'LMAYDI.",
+        "donate_invoice_error": "⚠️ Telegram to'lov hisobini yaratmadi: {error}",
         "stars_unit": "Stars (yulduzcha)",
-        "donate_custom_ask": "Nechta {unit} xayriya qilmoqchisiz? Raqam bilan javob bering.",
-        "donate_invalid_amount_retry": "Bu noto'g'ri miqdor — qayta urinish uchun /donate yuboring.",
-        "donate_thanks": "🙏 {amount} ⭐ uchun rahmat — bu chindan ham qadrlanadi!",
+        "donate_custom_ask": 'Qancha {unit} xayriya qilmoqchisiz? Faqat sonni yozib yuboring.',
+        "donate_invalid_amount_retry": "Miqdor noto'g'ri — qaytadan urinish uchun /donate yuboring.",
+        "donate_thanks": '🙏 {amount} ⭐ uchun katta rahmat!',
+        "topup_thanks": "🙏 {stars} ⭐ xayriyangiz uchun rahmat — bu botlarning ishlashiga yordam beradi.\n\nMinnatdorchilik sifatida {convert_bot} botida fayllarni o'girish uchun {total} ⚡ kredit oldingiz. U yerdagi balansingiz: {balance} ⚡.",
+        "topup_thanks_bonus": 'Shundan {bonus} ⚡ — bonus kredit, uning muddati {date} kuni tugaydi.',
+        "credit_cannot_be_withdrawn": "⚡ — ConvertBot'dagi konvertatsiyalar uchun kredit: uni yechib olib ham, Stars'ga aylantirib ham BO'LMAYDI. To'lovda muammo bo'lsa: /paysupport",
+        "paysupport_text": "💳 To'lov bo'yicha yordam\n\nTo'lovlar QAYTARILMAYDI: Stars qaytarib berilmaydi, ⚡ kreditni esa yechib olib ham, Stars'ga aylantirib ham BO'LMAYDI.\n\nTo'lovda xatolik bo'lgan bo'lsa — pul yechilgan-u, kredit tushmagan bo'lsa yoki ikki marta yechilgan bo'lsa — {contact} manziliga to'lov sanasi, miqdori va Telegram ID raqamingizni ({user_id}) yozib yuboring. Tekshirilib, kredit bilan to'g'rilab beriladi.\n\n/balance har bir to'lovni va u qancha kredit qo'shganini ko'rsatadi.",
+        "report_button": '🐞 Muammo haqida xabar berish',
+        "report_disclaimer": "📨 Bu muammo haqida bot egasiga xabar yuborilsinmi?\n\nNima yuboriladi: bot nomi, {code} xato kodi, {incident} hodisa raqami, muammo qachon yuz bergani va bot versiyasi.\n\nHech qanday shaxsiy ma'lumot yuborilmaydi.",
+        "report_send": '📨 Yuborish',
+        "report_cancel": '✖️ Bekor qilish',
+        "report_sent": '✅ Xabar yuborildi — rahmat! Bu muammoni tuzatishga yordam beradi.',
+        "report_already": 'Bu xabar allaqachon yuborilgan.',
+        "report_cancelled": 'Bekor qilindi — hech narsa yuborilmadi.',
+        "report_failed": "⚠️ Hozir xabarni yuborib bo'lmadi. Keyinroq qayta urinib ko'ring.",
+        "report_invalid": 'Bu tugma endi ishlamaydi.',
+        "crash_notice": "⚠️ Buni bajarishda bot tomonida xatolik yuz berdi, shuning uchun amal bajarilmadi. Birozdan keyin qayta urinib ko'ring.",
+        "sandbox_notice": '🧪 Test rejimi — haqiqiy Stars yechilmadi.',
+        "balance_header": "⚡ Balansingiz: {balance}",
+        "balance_totals": "Jami {paid} ⭐ to'landi · {credited} ⚡ qo'shildi · {spent} ⚡ sarflandi",
+        "balance_rate": 'Keyingi {left} ⭐ ning har biri {each} ⚡ beradi ({mult}×).',
+        "balance_rate_base": '1 ⭐ = {rate} ⚡.',
+        "balance_bonus_line": 'Shundan {bonus} ⚡ — bonus kredit; {soon} ⚡ ning muddati {date} kuni tugaydi.',
+        "balance_recent": 'Oxirgi amallar:',
+        "balance_empty_hint": '/donate orqali istalgan paytda kredit olishingiz mumkin.',
         "bot_short_description": (
             "Rasm, GIF va videolardan Telegram stiker to'plamlarini yasaydi."
         ),
@@ -426,263 +428,127 @@ STRINGS = {
         # ---- shared policy keys (/privacy, /terms, /deletemydata) ----
         "privacy_heading": "🔒 Maxfiylik",
         "privacy_kept_heading": "Bu bot nimalarni saqlaydi:",
-        "privacy_stored": (
-            "• Telegram foydalanuvchi raqamingiz va tanlagan tilingiz\n"
-            "• shu yerda yasagan to'plamlaringiz: har birining nomi va sarlavhasi, o'sha paytdagi "
-            "ismingiz va foydalanuvchi nomingiz\n"
-            "• to'plamga kimga qo'shish huquqini berganingiz va yaratgan havolalaringiz\n"
-            "• botdan har foydalanganingizda vaqt belgisi — egasi umuman kimdir "
-            "foydalanayotganini bilishi uchun\n"
-            "• xayriya qilsangiz, uning yozuvi: miqdori va Telegramning to'lov raqami\n"
-            "• bot siz bilan boshlagan ish tugagunicha uning holati"
-        ),
-        "privacy_seen_by_heading": "Yana kim ko'radi:",
-        "privacy_seen_by": (
-            "• Telegram — har bir xabarni ikki tomonga ham u tashiydi va o'z shartlarini o'zi "
-            "belgilaydi\n"
-            "• bot ishlab turgan hosting va u yozadigan ma'lumotlar bazasi"
-        ),
-        "privacy_others": (
-            "• bulardan boshqa hech kim — stikerlar bot ishlab turgan kompyuterda tayyorlanadi, tashqi "
-            "xizmatga murojaat qilinmaydi"
-        ),
+        "privacy_stored": "• Telegram ID raqamingiz va tanlagan tilingiz\n• shu bot orqali yaratgan to'plamlaringiz: har birining nomi va sarlavhasi, o'sha paytdagi ismingiz va foydalanuvchi nomingiz\n• to'plamlaringizga kimga qo'shish huquqi berganingiz va yaratgan havolalaringiz\n• botdan foydalangan vaqtingiz — bot egasi botdan umuman foydalanilayotganini bilishi uchun\n• xayriya qilsangiz, uning yozuvi: miqdori va Telegram to'lov raqami\n• bot siz uchun bajarayotgan ish — u tugagunicha",
+        "privacy_seen_by_heading": "Yana kim ko'ra oladi:",
+        "privacy_seen_by": "• Telegram — barcha xabarlar u orqali o'tadi va u o'z qoidalari asosida ishlaydi\n• bot joylashgan hosting va bot foydalanadigan ma'lumotlar bazasi",
+        "privacy_others": "• boshqa hech kim — stikerlar botning o'z serverida tayyorlanadi, tashqi xizmatlarga murojaat qilinmaydi",
         "privacy_kept_for_heading": "Qancha vaqt saqlanadi:",
-        "privacy_kept_for": (
-            "Sozlamalar va bot siz uchun ushlab turgan narsalar siz o'chirmaguningizcha yoki "
-            "botdan foydalanishni to'xtatmaguningizcha qoladi. Foydalanish belgilari taxminan uch "
-            "oydan keyin o'chiriladi. To'lov yozuvlari uzoqroq saqlanadi, chunki pulni qaytarish "
-            "o'shalar asosida amalga oshiriladi.\n"
-            "\n"
-            "Bu yerdagi hech narsa sotilmaydi, ijaraga berilmaydi va reklama uchun ishlatilmaydi; "
-            "yuqorida sanab o'tilmagan hech kimga hech narsa berilmaydi."
-        ),
-        "privacy_your_choices": (
-            "Nima qila olasiz:\n"
-            "/deletemydata — bot siz haqingizda saqlaganini o'chirish\n"
-            "/terms — botdan nima uchun foydalanish mumkinligi\n"
-            "\n"
-            "Telegramda botni bloklash uni siz bilan gaplashishdan to'xtatadi, lekin hech narsani "
-            "o'chirmaydi — ikkalasi ham kerak bo'lsa, avval /deletemydata yuboring."
-        ),
+        "privacy_kept_for": "Sozlamalaringiz va bot siz uchun saqlab turgan narsalar ularni o'chirmaguningizcha yoki botdan foydalanishni to'xtatmaguningizcha turadi. Foydalanish qaydlari taxminan uch oydan keyin o'chiriladi. To'lov yozuvlari va ⚡ balansingiz esa uzoqroq saqlanadi, chunki to'lov bo'yicha nizolar ular asosida hal qilinadi.\n\nBu ma'lumotlar sotilmaydi, ijaraga berilmaydi, reklamada ishlatilmaydi va yuqorida aytilganlardan boshqa hech kimga berilmaydi.",
+        "privacy_your_choices": "Nima qilishingiz mumkin:\n/deletemydata — bot siz haqingizda saqlagan ma'lumotlarni o'chirish\n/terms — botdan foydalanish shartlari\n\nBotni Telegramda bloklasangiz, u sizga yozmay qo'yadi, lekin hech narsa o'chmaydi. Ikkalasini ham xohlasangiz, avval /deletemydata yuboring.",
         "terms_heading": "📜 Shartlar",
-        "terms_use": (
-            "Botdan o'z maqsadi bo'yicha, qonun va Telegram shartlari doirasida foydalaning. Uni "
-            "birovni bezovta qilish uchun ishlatmang va u belgilagan cheklovlardan oshirib "
-            "yuklamang — bunday akkaunt bloklanadi."
-        ),
-        "terms_specific": (
-            "Stikerlar haqida: faqat o'zingizga tegishli narsani yuklang. Birovning ishidan "
-            "ruxsatsiz to'plam yasamang va Telegram shartlari taqiqlagan narsalardan to'plam "
-            "qilmang. To'plam yaratilgach Telegramda yashaydi — bu bot uni unutishi mumkin, "
-            "lekin o'chirishni faqat egasi, Telegram orqali qiladi."
-        ),
-        "terms_money": (
-            "Pul haqida: /donate ixtiyoriy va hech narsa sotib olmaydi — u botni ishlatish "
-            "xarajatlariga ketadi. Har bir to'lovni Telegram amalga oshiradi, bot karta raqamini "
-            "hech qachon ko'rmaydi. Adashib yuborsangiz, aytsangiz qaytariladi."
-        ),
-        "terms_no_warranty": (
-            "Va'da yo'q: buni bir kishi olib boradi, u bepul, va ogohlantirishsiz sekinlashishi, "
-            "xato qilishi yoki umuman o'chib qolishi mumkin. Siz uchun muhim narsaning nusxasini "
-            "o'zingizda saqlang."
-        ),
+        "terms_use": "Botdan maqsadiga ko'ra, qonun va Telegram qoidalari doirasida foydalaning. Uni boshqalarni bezovta qilish uchun ishlatmang va belgilangan cheklovlardan oshirib yuklamang — aks holda akkaunt bloklanadi.",
+        "terms_specific": "Stikerlar haqida: faqat o'zingizga tegishli narsalarni yuklang. Birovning ijodidan ruxsatsiz va Telegram qoidalari taqiqlagan narsalardan to'plam yasamang. Yaratilgan to'plam Telegram'da saqlanadi — bot uni unutishi mumkin, lekin o'chirishni faqat egasi Telegram orqali qila oladi.",
+        "terms_money": "Pul haqida: /donate — ixtiyoriy, mablag' botlar xarajatlariga ketadi. Stars'dagi to'lov ConvertBot'da konvertatsiyalar uchun ⚡ kredit ham beradi: har ⭐ uchun 2 ⚡, umumiy hisobda birinchi 500 ta Stars uchun esa 6 ⚡ dan, keyingi 500 tasi uchun 4 ⚡ dan. 2 ⚡ dan ortig'i bonus kredit bo'lib, to'lovdan 90 kun o'tgach muddati tugaydi. To'lovlar QAYTARILMAYDI: Stars qaytarib berilmaydi, kreditni esa yechib olib ham, Stars'ga aylantirib ham BO'LMAYDI. Har bir to'lovni Telegram o'tkazadi, bot karta raqamingizni ko'rmaydi. To'lovda muammo bo'lsa: /paysupport.",
+        "terms_no_warranty": "Kafolat yo'q: botni bir kishi yuritadi va u oldindan ogohlantirmasdan sekinlashishi, xato qilishi yoki butunlay to'xtab qolishi mumkin. Siz uchun muhim narsalarning nusxasini o'zingizda saqlang.",
         "policy_full_text": "To'liq matn: {url}",
-        "policy_contact": "Savollar, shikoyatlar yoki ma'lumot so'rovi: {contact}",
-        "delete_data_confirm": (
-            "⚠️ Bu bot siz haqingizda saqlagan narsalarni o'chiradi. Ortga qaytarib bo'lmaydi."
-        ),
-        "delete_data_consequences": (
-            "Bot siz shu yerda yasagan to'plamlarni unutadi: ularni ro'yxatda ko'rsatmaydi va "
-            "ularga yangi stiker qo'sha olmaydi. To'plamlarning o'zi o'rnatgan hammada "
-            "ishlayveradi — ularni butunlay o'chirishni Telegram orqali o'zingiz qilasiz. "
-            "Tilingiz, havolalaringiz va to'plamlaringizga berilgan qo'shish huquqlari ham "
-            "ketadi.\n"
-            "\n"
-            "Xayriya yozuvlari foydalanuvchi nomingizsiz qoladi, chunki pulni qaytarish o'shalar "
-            "asosida qilinadi."
-        ),
+        "policy_contact": "Savol, shikoyat yoki ma'lumot so'rovi uchun: {contact}",
+        "delete_data_confirm": "⚠️ Bot siz haqingizda saqlagan ma'lumotlar o'chiriladi. Buni ortga qaytarib bo'lmaydi.",
+        "delete_data_consequences": "Bot shu yerda yaratgan to'plamlaringizni unutadi: ular ro'yxatda ko'rinmaydi va ularga stiker qo'shib bo'lmaydi. To'plamlarning o'zi ularni o'rnatganlarda ishlashda davom etadi — butunlay o'chirishni Telegram orqali o'zingiz qilasiz. Til sozlamangiz, havolalaringiz va boshqalarga bergan qo'shish huquqlaringiz ham o'chiriladi.\n\nXayriya yozuvlari foydalanuvchi nomingizsiz saqlanib qoladi, chunki to'lov bo'yicha nizolar ular asosida hal qilinadi. ⚡ balansingiz ham saqlanadi — qaytib kelsangiz, u o'z joyida bo'ladi.",
         "delete_data_button_yes": "🗑 O'chirilsin",
         "delete_data_button_no": "↩️ Ma'lumotlarim qolsin",
         "delete_data_kept": "Hech narsa o'chirilmadi.",
-        "delete_data_done": (
-            "🗑 Bajarildi — {rows} ta yozuv o'chirildi.\n"
-            "\n"
-            "Istalgan payt /start yuboring; bot sizni yangi foydalanuvchi sifatida qabul qiladi."
-        ),
-        "delete_data_failed": (
-            "Hozir o'chira olmadim — mening tomonimda nimadir noto'g'ri ketdi. Bir necha "
-            "daqiqadan keyin qayta urinib ko'ring."
-        ),
+        "delete_data_done": "🗑 Bajarildi — {rows} ta yozuv o'chirildi.\n\nIstalgan payt /start yuborsangiz, bot sizni yangi foydalanuvchi sifatida kutib oladi.",
+        "delete_data_failed": "Hozir o'chirib bo'lmadi — bot tomonida xatolik yuz berdi. Bir necha daqiqadan keyin qayta urinib ko'ring.",
         "language_set_confirmation": "✅ Til o'zbekchaga o'zgartirildi.",
         "cancel_header": "\u274c Bekor qilindi:",
-        "cancel_nothing": "Bekor qiladigan narsa yo'q — men sizdan hech narsa kutmayotgan edim.",
-        "cancel_ask": "Nimani to'xtatay? Mana, men nimalarni kutyapman:",
+        "cancel_nothing": "Bekor qilinadigan amal yo'q — hozir hech narsa kutilmayapti.",
+        "cancel_ask": 'Qaysi birini bekor qilay? Hozir quyidagilar kutilmoqda:',
         "cancel_kept": "Yaxshi — hech narsa bekor qilinmadi.",
-        "cancel_reply_box_freed": "Javob yozish oynasi yana bo'sh.",
+        "cancel_reply_box_freed": "Xabar yozish maydoni endi bo'sh.",
         "cancel_button_all": "❌ Hammasini",
-        "cancel_button_none": "↩️ Hech narsani, davom etamiz",
+        "cancel_button_none": '↩️ Hech birini, davom etamiz',
         "cancel_button_donation": "💸 Xayriya miqdori",
-        "cancel_item_donation": "men so'ragan xayriya miqdori",
-        "cancel_item_stale_prompt": "javob kutib qolgan eski so'rov",
+        "cancel_item_donation": 'kiritilishi kutilayotgan xayriya miqdori',
+        "cancel_item_stale_prompt": "javobsiz qolgan eski so'rov",
         "cancel_item_new_pack": "siz nom qo'yayotgan yangi to'plam",
         "cancel_button_new_pack": "🆕 Yangi to'plamga nom berish",
         "cancel_item_rename": "\"{title}\" nomini o'zgartirish",
         "cancel_button_rename": "✏️ To'plam nomini o'zgartirish",
         "cancel_item_editing": "\"{title}\" ni tahrirlash",
         "cancel_button_editing": "📦 To'plamni tahrirlash",
-        "start_intro": (
-            "Salom! Men sizning rasm/GIF/video/stikerlaringizni Telegram stiker "
-            "to'plamlariga aylantiraman, shuningdek Instagram/TikTok havolalaridan "
-            "video ham olib bera olaman.\n\n"
-        ),
-        "help_text": (
-            "Buyruqlar:\n"
-            "/newpack - yangi stiker to'plamini boshlash\n"
-            "/addsticker - mavjud to'plamga stiker qo'shish\n"
-            "/mypacks - o'z to'plamlaringizni ko'rish\n"
-            "/import <to'plam havolasi/nomi> - (tahrirlash paytida) boshqa Telegram "
-            "to'plamidan stikerlarni ommaviy nusxalash, yoki WhatsApp stiker to'plami "
-            ".zip/.wastickers faylini yuborish\n"
-            "/done - to'plamni tahrirlashni tugatish\n"
-            "/cancel - men sizdan kutayotgan ishni to'xtatish (qaysinisini so'rayman)\n"
-            "/whomade <to'plam havolasi/nomi> - to'plamni kim yaratganini bilish "
-            "(agar shu bot orqali yaratilgan bo'lsa)\n"
-            "/donate - hosting xarajatlariga hissa qo'shish (butunlay ixtiyoriy)\n"
-            "/en, /uz, /rus - tilni almashtirish (yoki /language — u so\'raydi)\n\n"
-            "To'plamni tahrirlash paytida: rasm, GIF, video yoki statik/video "
-            "stikerlarni yuboring — ular qo'shiladi.\n"
-            "Ulardan biridan keyin emoji yuborsangiz, o'sha stikerga shu emoji belgilanadi.\n\n"
-            "/mypacks dan to'plamni bosib, uni qayta nomlashingiz, boshqa birov ham "
-            "stiker qo'sha olishi uchun hamtahrirlashni sozlashingiz yoki uni butunlay "
-            "o'chirishingiz mumkin (faqat egasi uchun, amalga oshirishdan oldin ikki "
-            "marta so'raladi).\n\n"
-            "Instagram/TikTok'dan video olishni yoki faylni boshqa formatga aylantirishni "
-            "xohlaysizmi? Ular endi quyidagi qarindosh botlarda joylashgan.\n\n"
-        ),
-        "whomade_usage": "Foydalanish: /whomade <to'plam nomi yoki t.me/addstickers havolasi>",
+        "start_intro": "Salom! Rasm, GIF, video va stikerlaringizdan Telegram stiker to'plamlari yasayman, Instagram/TikTok havolalaridan video ham olib bera olaman.\n\n",
+        "help_text": "Buyruqlar:\n/newpack - yangi stiker to'plami yaratish\n/addsticker - mavjud to'plamga stiker qo'shish\n/mypacks - to'plamlaringizni ko'rish\n/import <to'plam havolasi yoki nomi> - (tahrirlash vaqtida) boshqa Telegram to'plamidagi stikerlarni ko'chirish yoki WhatsApp to'plamining .zip/.wastickers faylini yuklash\n/done - to'plamni tahrirlashni yakunlash\n/cancel - joriy amalni bekor qilish (bir nechta bo'lsa, qaysi birini so'rayman)\n/whomade <to'plam havolasi yoki nomi> - to'plamni kim yaratganini bilish (shu bot orqali yaratilgan bo'lsa)\n/donate - server xarajatlariga hissa qo'shish (mutlaqo ixtiyoriy)\n/en, /uz, /rus - tilni almashtirish (yoki /language)\n\nTo'plamni tahrirlash vaqtida rasm, GIF, video yoki statik/video stiker yuborsangiz, u to'plamga qo'shiladi.\nUndan keyin emoji yuborsangiz, o'sha stikerga shu emoji biriktiriladi.\n\n/mypacks'da to'plamni tanlab, nomini o'zgartirishingiz, boshqalar ham stiker qo'sha olishi uchun birgalikda tahrirlashni yoqishingiz yoki uni butunlay o'chirishingiz mumkin (faqat egasi; o'chirishdan oldin ikki marta so'raladi).\n\nInstagram/TikTok'dan video yuklab olish yoki faylni boshqa formatga o'girish kerakmi? Bu endi pastdagi boshqa botlarimizda.\n\n⚠️ DIQQAT: To'lovlar QAYTARILMAYDI — /donate orqali to'langan Stars qaytarib berilmaydi, ular bergan ⚡ kreditni esa yechib olib BO'LMAYDI.\n\n",
+        "whomade_usage": "Qanday ishlatiladi: /whomade <to'plam nomi yoki t.me/addstickers havolasi>",
         "whomade_not_found": (
             "Bu to'plam haqida ma'lumotim yo'q — u shu bot orqali yaratilmagan "
             "yoki nom/havola noto'g'ri."
         ),
-        "whomade_result": "📦 \"{title}\"\nUni {creator} {date} sanada yaratgan (shu bot orqali).",
-        "coedit_link_invalid": "Bu hamtahrirlash havolasi yaroqsiz — ehtimol, to'plam egasi uni qayta tikladi (reset qildi).",
-        "coedit_pack_gone": "Bu to'plam endi mavjud emasga o'xshaydi.",
-        "coedit_own_pack": "Bu sizning o'z to'plamingiz — uni boshqarish uchun /mypacks dan foydalaning.",
-        "coedit_joined_intro": (
-            "Siz \"{title}\" to'plamiga hammuallif sifatida qo'shildingiz! Rasm, GIF, "
-            "video yoki statik/video stikerlarni yuboring — ular qo'shiladi, standart "
-            "emoji 😭, oxirgisini qayta belgilash uchun darhol keyin emoji yuboring. "
-            "Tugatgach /done ni bosing."
-        ),
+        "whomade_result": '📦 "{title}"\n{date} kuni {creator} tomonidan shu bot orqali yaratilgan.',
+        "coedit_link_invalid": "Bu havola yaroqsiz — ehtimol, to'plam egasi uni yangilagan.",
+        "coedit_pack_gone": "Bu to'plam o'chirilganga o'xshaydi.",
+        "coedit_own_pack": "Bu o'zingizning to'plamingiz — uni /mypacks orqali boshqaring.",
+        "coedit_joined_intro": 'Siz "{title}" to\'plamiga hammuallif bo\'ldingiz! Rasm, GIF, video yoki statik/video stiker yuboring — ular to\'plamga qo\'shiladi (standart emoji: 😭). Oxirgi stikerning emojisini o\'zgartirish uchun darhol emoji yuboring. Tugatgach, /done ni bosing.',
         "btn_new_pack": "➕ Yangi to'plam",
         "btn_my_packs": "📁 Mening to'plamlarim",
         "btn_help": "❓ Yordam",
         "btn_back": "⬅️ Orqaga",
-        "no_packs_yet": "Hali to'plamlar yo'q — \"Yangi to'plam\"ni bosing yoki /newpack dan foydalaning.",
+        "no_packs_yet": "Hali to'plamingiz yo'q — «Yangi to'plam» tugmasini bosing yoki /newpack yuboring.",
         "your_packs": "Sizning to'plamlaringiz:",
         "not_your_pack": "Bu sizning to'plamingiz emas.",
         "pack_detail_title": "📦 {title}",
         "btn_open_pack": "🔗 To'plamni ochish",
         "btn_add_stickers": "➕ Stiker qo'shish",
         "btn_rename": "✏️ Nomini o'zgartirish",
-        "btn_coedit": "👥 Hamtahrirlash",
+        "btn_coedit": '👥 Birgalikda tahrirlash',
         "btn_delete_pack": "🗑️ To'plamni o'chirish",
         "coedit_count_some": "Hozircha {count} ta hammuallif bor.",
         "coedit_count_none": "Hali hammualliflar yo'q.",
-        "coedit_message": (
-            "👥 \"{title}\" uchun hamtahrirlash\n\n"
-            "Havola: {link}\n\n"
-            "Uni ulashing — uni ochgan har bir kishi bot orqali shu to'plamga stiker "
-            "qo'sha oladi (ular baribir sizning nomingiz ostida qo'shiladi).\n\n"
-            "{editors_line}\n\n"
-            "Havolani yangilang, shunda u yangi kishilarga kirish huquqini bermaydi."
-        ),
+        "coedit_message": '👥 "{title}" — birgalikda tahrirlash\n\nHavola: {link}\n\nHavolani ulashing — uni ochgan har kim bot orqali bu to\'plamga stiker qo\'sha oladi (to\'plam baribir sizning nomingizda qoladi).\n\n{editors_line}\n\nYangi odamlar qo\'shilmasligi uchun havolani yangilashingiz mumkin.',
         "btn_reset_link": "🔄 Havolani yangilash",
-        "only_owner_coedit": "Hamtahrirlashni faqat to'plam egasi boshqara oladi.",
+        "only_owner_coedit": "Birgalikda tahrirlashni faqat to'plam egasi boshqara oladi.",
         "link_reset_confirm": "Havola yangilandi — eskisi endi ishlamaydi.",
         "only_owner_rename": "To'plamni faqat egasi qayta nomlay oladi.",
         "rename_prompt": "\"{title}\" uchun yangi nom yuboring.",
-        "rename_broken_state": "Nimadir xato ketdi — /mypacks dan qayta \"Nomini o'zgartirish\"ni sinab ko'ring.",
+        "rename_broken_state": "Xatolik yuz berdi — /mypacks orqali «Nomini o'zgartirish»ni qaytadan bosing.",
         "btn_back_to_pack": "⬅️ To'plamga qaytish",
         "renamed_success": "\"{title}\" deb qayta nomlandi.",
         "renamed_failed": "Nomini o'zgartirib bo'lmadi: {error}",
         "only_owner_delete": "To'plamni faqat egasi o'chira oladi.",
         "btn_delete": "🗑️ O'chirish",
         "btn_cancel_inline": "⬅️ Bekor qilish",
-        "delete_confirm1": (
-            "⚠️ \"{title}\" o'chirilsinmi? Bu uni Telegram'da unga ega bo'lgan hamma "
-            "uchun, jumladan hammualliflar uchun ham o'chiradi va buni ortga qaytarib "
-            "bo'lmaydi."
-        ),
+        "delete_confirm1": '⚠️ "{title}" o\'chirilsinmi? U Telegram\'dan hamma uchun, jumladan hammualliflar uchun ham o\'chib ketadi. Buni ortga qaytarib bo\'lmaydi.',
         "btn_delete_confirm": "🗑️ Ha, butunlay o'chirilsin",
         "delete_confirm2": "❗ Oxirgi tekshiruv — \"{title}\" butunlay o'chirilsinmi? Bundan keyin ortga qaytarib bo'lmaydi.",
         "delete_failed": "⚠️ O'chirib bo'lmadi: {error}",
         "btn_my_packs_back": "⬅️ Mening to'plamlarim",
         "delete_success": "🗑️ \"{title}\" butunlay o'chirildi.",
         "newpack_title_prompt": "To'plamning nomi qanday bo'lsin?",
-        "title_empty": "Bu bo'sh — to'plam uchun haqiqiy nom yuboring.",
+        "title_empty": "Nom bo'sh bo'lmasin — to'plam uchun nom yuboring.",
         "title_truncated": "Telegram to'plam nomini 64 belgigacha cheklaydi — \"{title}\" ishlatiladi.",
-        "editing_intro_new": (
-            "Rasm, GIF, video yoki statik/video stikerlarni yuboring — har biri "
-            "standart 😭 emojisi bilan qo'shiladi. Oxirgisini qayta belgilash uchun "
-            "darhol keyin emoji yuboring. Tugatgach /done ni bosing."
-        ),
-        "no_packs_for_add": "Sizda hali to'plamlar yo'q. Avval /newpack dan foydalaning.",
+        "editing_intro_new": "Rasm, GIF, video yoki statik/video stiker yuboring — har biri 😭 emojisi bilan qo'shiladi. Oxirgi stikerning emojisini o'zgartirish uchun darhol emoji yuboring. Tugatgach, /done ni bosing.",
+        "no_packs_for_add": "Hali to'plamingiz yo'q. Avval /newpack yuboring.",
         "pick_pack_prompt": "Qaysi to'plam? Uni bosing, keyin \"➕ Stiker qo'shish\"ni tanlang.",
-        "editing_intro_add": (
-            "Qo'shish uchun rasm, GIF, video yoki statik/video stikerlarni yuboring — "
-            "standart emoji 😭, oxirgisini qayta belgilash uchun darhol keyin emoji "
-            "yuboring. Tugatgach /done ni bosing.\n\n"
-            "Maslahat: shu to'plamda allaqachon bor stikerni yuborsangiz, u dublikat "
-            "sifatida qo'shilmaydi, aksincha olib tashlanadi."
-        ),
+        "editing_intro_add": "Qo'shish uchun rasm, GIF, video yoki statik/video stiker yuboring (standart emoji: 😭). Oxirgi stikerning emojisini o'zgartirish uchun darhol emoji yuboring. Tugatgach, /done ni bosing.\n\nMaslahat: to'plamda allaqachon bor stikerni yuborsangiz, u ikkinchi marta qo'shilmaydi — aksincha, to'plamdan olib tashlanadi.",
         "status_verb_creating": "Yaratilmoqda",
         "status_verb_editing": "Tahrirlanmoqda",
         "status_line": "📝 \"{title}\" {verb} — shu seansda {count} ta stiker qo'shildi",
         "status_default_title": "bu to'plam",
         "btn_delete_pack_yes": "🗑️ Ha, to'plam o'chirilsin",
         "btn_cancel": "Bekor qilish",
-        "remove_last_confirm": (
-            "Bu to'plamda qolgan yagona stiker — uni olib tashlash *butun to'plamni* "
-            "Telegram'dan o'chirib yuboradi, chunki to'plamlar bo'sh bo'lishi mumkin "
-            "emas. Ishonchingiz komilmi?"
-        ),
+        "remove_last_confirm": "Bu to'plamdagi oxirgi stiker — uni olib tashlasangiz, *butun to'plam* Telegram'dan o'chadi, chunki to'plam bo'sh bo'lolmaydi. Ishonchingiz komilmi?",
         "remove_failed": "⚠️ Bu stikerni olib tashlab bo'lmadi: {error}",
-        "remove_success": "🗑️ Bu stiker allaqachon shu to'plamda bor edi — uni olib tashladim.",
+        "remove_success": "🗑️ Bu stiker to'plamda allaqachon bor edi — uni olib tashladim.",
         "keep_pack": "Yaxshi, to'plam o'zgarishsiz qoldirildi.",
         "pack_deleted_empty": "🗑️ To'plam o'chirildi (unda stiker qolmagan edi).",
         "pack_deleted_note": "❌ To'plam o'chirildi.",
-        "image_process_failed": "Bu rasmni qayta ishlab bo'lmadi: {error}",
-        "added_default_emoji": "{emoji} bilan qo'shildi — qayta belgilash uchun emoji yuboring.",
+        "image_process_failed": "Rasmni qayta ishlab bo'lmadi: {error}",
+        "added_default_emoji": "{emoji} bilan qo'shildi — boshqa emoji kerak bo'lsa, uni yuboring.",
         "last_attempt_failed": "⚠️ Oxirgi urinish muvaffaqiyatsiz tugadi — qayta urinish uchun boshqa narsa yuboring yoki /cancel qiling.",
         "converting_video": "Video stikerga aylantirilmoqda...",
-        "video_convert_failed_redirect": (
-            "{error}\n\nBuni stikerga aylantirib bo'lmaydi, lekin agar sizga shunchaki "
-            "oddiy formatdagi fayl kerak bo'lsa, buni @ConvertBot qila oladi — shu "
-            "faylni o'sha yerga yuboring 👇"
-        ),
+        "video_convert_failed_redirect": "{error}\n\nBundan stiker yasab bo'lmaydi, lekin faylni boshqa formatga o'girish kerak bo'lsa, @ConvertBot yordam beradi — faylni o'sha yerga yuboring 👇",
         "video_convert_generic_failed": "Buni aylantirib bo'lmadi: {error}",
-        "added_video_default_emoji": (
-            "Standart {emoji} bilan video stiker sifatida qo'shildi. Uni qayta "
-            "belgilash uchun hozir emoji yuboring, davom etish uchun yana "
-            "rasm/GIF/video yuboring yoki tugatish uchun /done ni bosing."
-        ),
+        "added_video_default_emoji": "Video stiker {emoji} emojisi bilan qo'shildi. Emojini o'zgartirish uchun hozir boshqasini yuboring, davom etish uchun yana rasm/GIF/video yuboring yoki tugatish uchun /done ni bosing.",
         "animated_not_supported": (
             "Animatsion (Lottie/.tgs) stikerlar qo'llab-quvvatlanmaydi — buning "
             "o'rniga statik rasm, GIF/video yoki statik/video stiker yuboring."
         ),
-        "import_usage": (
-            "Boshqa ochiq Telegram to'plamidan stikerlarni shu to'plamga nusxalash "
-            "uchun /import <telegram to'plam havolasi yoki nomi> yuboring — yoki "
-            "shunchaki WhatsApp stiker to'plami .zip/.wastickers faylini "
-            "to'g'ridan-to'g'ri yuboring."
-        ),
+        "import_usage": "Boshqa ochiq Telegram to'plamidagi stikerlarni shu to'plamga ko'chirish uchun /import <to'plam havolasi yoki nomi> yuboring — yoki WhatsApp to'plamining .zip/.wastickers faylini to'g'ridan-to'g'ri yuboring.",
         "import_invalid_source": "Bu haqiqiy to'plam nomi yoki t.me/addstickers havolasiga o'xshamayapti.",
         "import_fetching": "\"{source}\" dan stikerlar olinmoqda...",
         "import_summary_head": "\"{source}\" dan {added} ta stiker import qilindi",
         "import_summary_skipped": ", {skipped} ta qo'llab-quvvatlanmaydigani (animatsion/Lottie) o'tkazib yuborildi",
         "import_summary_failed": ", {failed} tasi muvaffaqiyatsiz tugadi",
-        "import_summary_tail": ". Davom etish uchun yana yuboraversangiz bo'ladi, yoki tugatish uchun /done ni bosing.",
+        "import_summary_tail": '. Yana yuborishingiz mumkin, tugatish uchun esa /done ni bosing.',
         "done_standalone_hint": (
             "Tugatadigan narsa yo'q — hozir hech qanday to'plamni tahrirlamayapsiz. "
             "/newpack bilan yangisini boshlang yoki /mypacks dagi to'plamda "
@@ -697,20 +563,17 @@ STRINGS = {
         "whatsapp_summary_head": "WhatsApp to'plamidan {added} ta stiker import qilindi",
         "not_emoji_message": "Qo'shish uchun rasm/GIF/video/stiker yuboring, oxirgisini qayta belgilash uchun emoji yuboring, yoki /done ni bosing.",
         "no_sticker_to_tag": "Avval stiker qo'shing, keyin uni belgilash uchun emoji yuboring.",
-        "retagged_success": "{emojis} sifatida qayta belgilandi.",
+        "retagged_success": "Emoji o'zgartirildi: {emojis}",
         "retag_failed": "Emojini yangilab bo'lmadi: {error}",
         "nothing_added_yet": "Siz hali hech narsa qo'shmadingiz. Avval rasm yuboring.",
         "done_success": (
             "✅ \"{title}\" tugallandi — shu seansda {count} ta stiker qo'shildi.\n\n"
             "Tayyor: https://t.me/addstickers/{pack_name}"
         ),
-        "convert_redirect": (
-            "Fayl konvertatsiyasi (rasm/video/audio, faqat stikerga xos bo'lmagan) "
-            "endi @ConvertBot ga ko'chirildi — ochish uchun quyidagini bosing."
-        ),
+        "convert_redirect": "Fayllarni o'girish (stiker bo'lmagan rasm, video, audio) endi @ConvertBot'da — ochish uchun pastdagi tugmani bosing.",
         "cancelled_status_note": "❌ Bekor qilindi.",
         "unrecognized": "Bu nima uchunligini tushunmadim — /newpack, /mypacks yoki /help ni sinab ko'ring.",
-        "unknown_command": "Bu buyruqni tanimadim. Nima qila olishimni bilish uchun /help yuboring.",
+        "unknown_command": "Bunday buyruq yo'q. Bot nimalar qila olishini bilish uchun /help yuboring.",
         "err_invalid_name": (
             "⚠️ Telegram to'plamning ichki nomini rad etdi — bu odatda nom raqam yoki "
             "belgidan boshlanganda yuz beradi. /cancel yuboring, so'ng harfdan "
@@ -730,10 +593,10 @@ STRINGS = {
             "shuning uchun qayta urinishdan oldin to'plamni tekshiring. Qayta urinib "
             "ko'rishingiz mumkin, yoki to'xtatish uchun /cancel qiling."
         ),
-        "restarting_send_again": "🔄 Hozir yangilanmoqdaman — bir necha soniyadan so'ng buni qaytadan yuboring.",
-        "update_soon_try_later": "🔧 Hozir yangilanaman, shuning uchun yangi ish boshlay olmayman — taxminan {minutes} daqiqadan so'ng qaytadan urinib ko'ring. Qaytganimda o'zim xabar beraman.",
-        "update_soon_try_later_soon": "🔧 Hozir yangilanmoqdaman, shuning uchun yangi ish boshlay olmayman — birozdan so'ng qaytadan urinib ko'ring. Qaytganimda o'zim xabar beraman.",
-        "update_will_reset": "🔧 Diqqat: men yangilanmoqchiman va hozir boshlagan ishingiz bekor qilinadi. Bir necha daqiqadan so'ng qaytadan boshlashingiz mumkin.",
+        "restarting_send_again": '🔄 Bot hozir yangilanmoqda — bir necha soniyadan keyin qaytadan yuboring.',
+        "update_soon_try_later": "🔧 Bot tez orada yangilanadi, shuning uchun yangi ishni boshlab bo'lmaydi — taxminan {minutes} daqiqadan keyin qayta urinib ko'ring. Ishga tushgach, o'zim xabar beraman.",
+        "update_soon_try_later_soon": "🔧 Bot hozir yangilanmoqda, shuning uchun yangi ishni boshlab bo'lmaydi — birozdan keyin qayta urinib ko'ring. Ishga tushgach, o'zim xabar beraman.",
+        "update_will_reset": "🔧 Diqqat: bot yangilanadi va hozir bajarilayotgan ishingiz to'xtab qoladi. Bir necha daqiqadan keyin qaytadan boshlashingiz mumkin.",
         "update_done_try_now": "✅ Yangilanish tugadi — endi qaytadan urinib ko'rishingiz mumkin.",
         "video_convert_ffmpeg_missing": (
             "Bu serverda ffmpeg o'rnatilmagan, shuning uchun GIF/video stikerlarni "
@@ -771,14 +634,39 @@ STRINGS = {
         "donate_custom_button": "✏️ Другое {symbol}",
         "donate_too_many_stars": "Это очень много звёзд! Пусть будет меньше {max} ⭐ за одно пожертвование.",
         "donate_out_of_range": "Пожертвования в {currency} должны быть в диапазоне от {lo} до {hi} {symbol}.",
-        "donate_invoice_title": "Угостите бота кофе ☕",
-        "donate_invoice_description": "Разовое добровольное пожертвование на хостинг. Спасибо!",
-        "donate_invoice_label": "Пожертвование",
+        "donate_invoice_title": "Поддержать хостинг",
+        "donate_invoice_description": "Идёт на расходы по работе бота и добавляет {credited} ⚡ на ваш баланс для конвертаций в ConvertBot.",
+        "donate_invoice_label": "Вклад в хостинг",
+        "donate_invoice_description_fiat": 'Разовое добровольное пожертвование на хостинг. Спасибо!',
+        "donate_prompt_credit": 'Оплаченные Stars превращаются в ⚡ кредит на конвертации в ConvertBot. Следующие {left} ⭐ дают по {each} ⚡ ({mult}×): {rate} ⚡ обычного кредита и бонус, который сгорает через {days} дней после оплаты. ⚡ НЕЛЬЗЯ вывести или обменять обратно на Stars.',
+        "donate_prompt_credit_base": 'Оплаченные Stars превращаются в ⚡ кредит на конвертации в ConvertBot, {rate} ⚡ за ⭐. ⚡ НЕЛЬЗЯ вывести или обменять обратно на Stars.',
         "donate_invoice_error": "⚠️ Telegram не смог создать этот счёт: {error}",
         "stars_unit": "Stars (звёзды)",
         "donate_custom_ask": "Сколько {unit} вы хотите пожертвовать? Ответьте числом.",
         "donate_invalid_amount_retry": "Это некорректная сумма — отправьте /donate, чтобы попробовать снова.",
         "donate_thanks": "🙏 Спасибо за {amount} ⭐ — это по-настоящему ценно!",
+        "topup_thanks": '🙏 Спасибо за пожертвование в {stars} ⭐ — это помогает ботам работать.\n\nВ благодарность вы получили {total} ⚡ кредита в {convert_bot} — его можно тратить на конвертацию файлов. Ваш баланс там: {balance} ⚡.',
+        "topup_thanks_bonus": 'Из них {bonus} ⚡ — бонусный кредит, он сгорит {date}.',
+        "credit_cannot_be_withdrawn": '⚡ — это кредит на конвертации в ConvertBot, его НЕЛЬЗЯ вывести или обменять обратно на Stars. Проблема с платежом? /paysupport',
+        "paysupport_text": '💳 Помощь с платежом\n\nПлатежи ОКОНЧАТЕЛЬНЫЕ: Stars НЕ возвращаются, а ⚡ кредит НЕЛЬЗЯ вывести или обменять обратно на Stars.\n\nЕсли с платежом что-то пошло не так — деньги списали, а кредит не пришёл, или списали дважды, — напишите на {contact}: дату, сумму и ваш Telegram ID, {user_id}. Это проверят и исправят кредитом.\n\n/balance показывает каждый платёж и что он добавил.',
+        "report_button": '🐞 Сообщить о проблеме',
+        "report_disclaimer": '📨 Отправить владельцу бота сообщение об этой проблеме?\n\nЧто отправится: название бота, код ошибки {code}, номер случая {incident}, когда это произошло, и версия бота.\n\nЛичные данные не отправляются.',
+        "report_send": '📨 Отправить',
+        "report_cancel": '✖️ Отмена',
+        "report_sent": '✅ Сообщение отправлено — спасибо! Это поможет всё исправить.',
+        "report_already": 'Это сообщение уже отправлено.',
+        "report_cancelled": 'Отменено — ничего не отправлено.',
+        "report_failed": '⚠️ Сейчас не удалось отправить сообщение. Попробуйте позже.',
+        "report_invalid": 'Эта кнопка больше не работает.',
+        "crash_notice": '⚠️ При обработке произошла ошибка на стороне бота, поэтому ничего не сделано. Попробуйте ещё раз чуть позже.',
+        "sandbox_notice": "🧪 Тестовый режим — настоящие Stars не списывались.",
+        "balance_header": "⚡ Ваш баланс: {balance}",
+        "balance_totals": "Всего оплачено {paid} ⭐ · начислено {credited} ⚡ · потрачено {spent} ⚡",
+        "balance_rate": 'Следующие {left} ⭐ дают по {each} ⚡ ({mult}×).',
+        "balance_rate_base": '1 ⭐ даёт {rate} ⚡.',
+        "balance_bonus_line": 'Из них {bonus} ⚡ — бонусный кредит; {soon} ⚡ сгорит {date}.',
+        "balance_recent": "Последние операции:",
+        "balance_empty_hint": "/donate добавит кредит в любой момент.",
         "bot_short_description": (
             "Делает стикерпаки из картинок, GIF и видео."
         ),
@@ -815,14 +703,7 @@ STRINGS = {
             "внешние сервисы не вызываются"
         ),
         "privacy_kept_for_heading": "Сколько это хранится:",
-        "privacy_kept_for": (
-            "Настройки и всё, что бот держит для тебя, остаются, пока ты их не сотрёшь или не "
-            "перестанешь пользоваться ботом. Отметки об использовании удаляются примерно через "
-            "три месяца. Записи о платежах хранятся дольше — по ним делается возврат.\n"
-            "\n"
-            "Ничего из этого не продаётся, не сдаётся в аренду и не используется для рекламы, и "
-            "никому кроме перечисленных выше не передаётся."
-        ),
+        "privacy_kept_for": 'Настройки и всё, что бот держит для тебя, остаются, пока ты их не сотрёшь или не перестанешь пользоваться ботом. Отметки об использовании удаляются примерно через три месяца. Записи о платежах и баланс ⚡ хранятся дольше — по ним разбираются споры о платежах.\n\nНичего из этого не продаётся, не сдаётся в аренду и не используется для рекламы, и никому кроме перечисленных выше не передаётся.',
         "privacy_your_choices": (
             "Что можно сделать:\n"
             "/deletemydata — стереть всё, что бот хранит о тебе\n"
@@ -843,11 +724,7 @@ STRINGS = {
             "Созданный пак живёт в Telegram — бот может о нём забыть, но удалить его может "
             "только владелец и только через Telegram."
         ),
-        "terms_money": (
-            "О деньгах: /donate — дело добровольное и ничего не покупает: деньги идут на то, во "
-            "что бот обходится. Все платежи проводит Telegram, бот никогда не видит номер карты. "
-            "Отправил по ошибке — скажи, и вернём."
-        ),
+        "terms_money": 'О деньгах: /donate — дело добровольное, деньги идут на то, во что обходятся боты. Платёж в Stars ещё и добавляет ⚡ кредит на конвертации в ConvertBot: 2 ⚡ за ⭐, а за твои первые 500 Stars — 6 и за следующие 500 — 4. Всё сверх 2 — бонусный кредит, он сгорает через 90 дней после платежа. Платежи ОКОНЧАТЕЛЬНЫЕ: Stars НЕ возвращаются, а кредит НЕЛЬЗЯ вывести или обменять обратно на Stars. Все платежи проводит Telegram, бот никогда не видит номер карты. Проблема с платежом — /paysupport.',
         "terms_no_warranty": (
             "Без обещаний: бота ведёт один человек, он бесплатный и может тормозить, ошибаться "
             "или вовсе не работать без предупреждения. Держи свою копию всего, что тебе важно."
@@ -855,14 +732,7 @@ STRINGS = {
         "policy_full_text": "Полный текст: {url}",
         "policy_contact": "Вопросы, жалобы или запрос по данным: {contact}",
         "delete_data_confirm": "⚠️ Это сотрёт всё, что бот хранит о тебе. Отменить будет нельзя.",
-        "delete_data_consequences": (
-            "Бот забудет паки, которые ты через него собрал: перестанет их показывать и не сможет "
-            "в них ничего добавить. Сами паки продолжат работать у всех, кто их установил — по- "
-            "настоящему удалить пак можно только самому, через Telegram. Язык, твои ссылки и "
-            "чужой доступ на добавление в твои паки тоже пропадут.\n"
-            "\n"
-            "Записи о пожертвованиях останутся, без username, потому что по ним делается возврат."
-        ),
+        "delete_data_consequences": 'Бот забудет паки, которые ты через него собрал: перестанет их показывать и не сможет в них ничего добавить. Сами паки продолжат работать у всех, кто их установил — по- настоящему удалить пак можно только самому, через Telegram. Язык, твои ссылки и чужой доступ на добавление в твои паки тоже пропадут.\n\nЗаписи о пожертвованиях останутся, без username, потому что по ним разбираются споры о платежах. Баланс ⚡ тоже останется — он твой, если вернёшься.',
         "delete_data_button_yes": "🗑 Стереть",
         "delete_data_button_no": "↩️ Оставить мои данные",
         "delete_data_kept": "Ничего не стёрто.",
@@ -897,29 +767,7 @@ STRINGS = {
             "стикеров Telegram, а также могу скачать видео по ссылке из "
             "Instagram/TikTok.\n\n"
         ),
-        "help_text": (
-            "Команды:\n"
-            "/newpack - начать новый набор стикеров\n"
-            "/addsticker - добавить стикеры в существующий набор\n"
-            "/mypacks - показать ваши наборы\n"
-            "/import <ссылка/имя набора> - (во время редактирования) массово "
-            "скопировать стикеры из другого набора Telegram, или отправить файл "
-            "экспорта набора стикеров WhatsApp .zip/.wastickers\n"
-            "/done - закончить редактирование набора\n"
-            "/cancel - остановить то, чего я от вас жду (спрошу, что именно)\n"
-            "/whomade <ссылка/имя набора> - узнать, кто создал набор (если он был "
-            "создан через этого бота)\n"
-            "/donate - помочь с расходами на хостинг (совершенно необязательно)\n"
-            "/en, /uz, /rus - сменить язык (или /language — он спрашивает)\n\n"
-            "Во время редактирования набора: отправляйте изображения, GIF, видео "
-            "или статические/видео-стикеры, чтобы добавить их.\n"
-            "Отправьте эмодзи сразу после стикера, чтобы пометить его этим эмодзи.\n\n"
-            "Нажмите на набор в /mypacks, чтобы переименовать его, настроить "
-            "совместное редактирование, чтобы кто-то ещё мог добавлять стикеры, или "
-            "удалить его насовсем (только для владельца, дважды спрашивает перед этим).\n\n"
-            "Хотите скачать видео из Instagram/TikTok или сконвертировать файл в "
-            "другой формат? Теперь это делают соседние боты ниже.\n\n"
-        ),
+        "help_text": 'Команды:\n/newpack - начать новый набор стикеров\n/addsticker - добавить стикеры в существующий набор\n/mypacks - показать ваши наборы\n/import <ссылка/имя набора> - (во время редактирования) массово скопировать стикеры из другого набора Telegram, или отправить файл экспорта набора стикеров WhatsApp .zip/.wastickers\n/done - закончить редактирование набора\n/cancel - остановить то, чего я от вас жду (спрошу, что именно)\n/whomade <ссылка/имя набора> - узнать, кто создал набор (если он был создан через этого бота)\n/donate - помочь с расходами на хостинг (совершенно необязательно)\n/en, /uz, /rus - сменить язык (или /language — он спрашивает)\n\nВо время редактирования набора: отправляйте изображения, GIF, видео или статические/видео-стикеры, чтобы добавить их.\nОтправьте эмодзи сразу после стикера, чтобы пометить его этим эмодзи.\n\nНажмите на набор в /mypacks, чтобы переименовать его, настроить совместное редактирование, чтобы кто-то ещё мог добавлять стикеры, или удалить его насовсем (только для владельца, дважды спрашивает перед этим).\n\nХотите скачать видео из Instagram/TikTok или сконвертировать файл в другой формат? Теперь это делают соседние боты ниже.\n\n⚠️ ВНИМАНИЕ: платежи окончательные — Stars, оплаченные через /donate, НЕ возвращаются, а добавленный ими ⚡ кредит НЕЛЬЗЯ вывести.\n\n',
         "whomade_usage": "Использование: /whomade <имя набора или ссылка t.me/addstickers>",
         "whomade_not_found": (
             "У меня нет записи об этом наборе — либо он не был создан через этого "
@@ -1114,10 +962,19 @@ STRINGS = {
 }
 
 
+# Every problem a person can run into ends with its code, and the code is what
+# puts a "Report the issue" button under it -- see problems.py. Imported here,
+# below the tables, because it is pure data and nothing above needs it.
+import problems  # noqa: E402
+
+_BOT = "sticker_bot"
+
+
 def t(lang: str | None, key: str, **kwargs) -> str:
     table = STRINGS.get(lang) or STRINGS["en"]
     template = table.get(key) or STRINGS["en"].get(key, key)
-    return template.format(**kwargs) if kwargs else template
+    text = template.format(**kwargs) if kwargs else template
+    return text + problems.code_line(problems.code_for(_BOT, key))
 
 
 async def get_lang(user_id: int, context) -> str:
@@ -1131,3 +988,61 @@ async def get_lang(user_id: int, context) -> str:
     lang = await asyncio.to_thread(db.get_user_language, user_id) or "en"
     context.user_data["lang"] = lang
     return lang
+
+
+# ---------------------------------------------------------------------------
+# The slash menu, in the other two languages
+# ---------------------------------------------------------------------------
+# English lives in BOT_COMMANDS in bot.py, where the menu can be read by
+# reading the file. These are the same commands for a client whose language is
+# Uzbek or Russian; shared_features.publish_commands() sends one list per
+# language and Telegram picks the matching one.
+#
+# Deliberately absent: /language, /en, /uz and /rus. Each of the three is
+# written in the language it switches TO, and /language is written in all
+# three at once, because they are the way back for somebody who chose the
+# wrong one. Translating them would make the menu of a Russian client offer
+# three lines of Russian, one of which is the only route out.
+#
+# A command missing from here keeps its English description rather than
+# vanishing from that language's menu -- a half-translated menu is a menu
+# with commands missing, and a missing command reads as a bot that cannot do
+# the thing. Kept honest by tests/test_menu.py, which fails on a command that
+# has no entry here and on an entry naming a command that no longer exists.
+
+COMMAND_MENU = {
+    "uz": {
+        "start": "Boshlash / ko'rsatmalarni ko'rish",
+        "newpack": "Yangi stiker to'plamini boshlash",
+        "addsticker": "Mavjud to'plamga stiker qo'shish",
+        "mypacks": "To'plamlaringiz ro'yxati",
+        "help": "Nima qila olishimni ko'rsatish",
+        "import": "Tahrirlanayotgan to'plamga stikerlarni ko'chirish",
+        "done": "To'plamni tahrirlashni tugatish",
+        "cancel": "Kutilayotgan amalni bekor qilish",
+        "whomade": "To'plamni kim yaratganini ko'rish",
+        "balance": "⚡ kredit balansingiz",
+        "donate": "Server xarajatlariga hissa qo'shish",
+        "paysupport": "To'lov bo'yicha yordam",
+        "privacy": "Bot siz haqingizda nima saqlaydi",
+        "terms": "Botdan nima uchun foydalanish mumkin",
+        "deletemydata": "Bot saqlagan ma'lumotlaringizni o'chirish",
+    },
+    "ru": {
+        "start": "Начать / посмотреть инструкцию",
+        "newpack": "Создать новый стикерпак",
+        "addsticker": "Добавить стикеры в готовый пак",
+        "mypacks": "Список ваших паков",
+        "help": "Показать, что я умею",
+        "import": "Скопировать стикеры в редактируемый пак",
+        "done": "Завершить редактирование пака",
+        "cancel": "Отменить то, чего я жду",
+        "whomade": "Узнать, кто создал пак",
+        "balance": "Ваш баланс — кредиты",
+        "donate": "Поддержать — расходы на хостинг",
+        "paysupport": "Помощь с платежом",
+        "privacy": "Что бот хранит о вас",
+        "terms": "Для чего можно использовать бота",
+        "deletemydata": "Удалить всё, что бот о вас хранит",
+    },
+}

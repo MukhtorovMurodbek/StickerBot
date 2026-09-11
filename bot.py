@@ -74,6 +74,7 @@ from telegram.ext import (
 
 import family_link
 import i18n
+import problems
 import lifecycle
 import live_message
 from live_message import LiveMessage, edit_in_place
@@ -109,11 +110,15 @@ from import_utils import (
 from shared_features import (
     publish_profile,
     publish_commands,
+    refresh_chat_menu,
     ERASE_PREFIX,
     delete_my_data_chosen,
     delete_my_data_command,
     privacy_command,
     terms_command,
+    paysupport_command,
+    attach_problem_reports,
+    problem_report_callback,
     attach_flood_gate,
     attach_maintenance,
     refuse_new_work,
@@ -134,6 +139,7 @@ from shared_features import (
     sibling_bots_blurb,
     sibling_bots_keyboard_row,
     maybe_donation_nudge,
+    balance_command,
     donate_command,
     donate_amount_chosen,
     donate_fiat_amount_chosen,
@@ -203,7 +209,9 @@ BOT_COMMANDS = [
     BotCommand("done", "Finish editing a pack"),
     BotCommand("cancel", "Stop whatever I'm waiting for"),
     BotCommand("whomade", "See who created a pack"),
-    BotCommand("donate", "Chip in for hosting costs"),
+    BotCommand("balance", "Your credit balance"),
+    BotCommand("donate", "Contribute to hosting costs"),
+    BotCommand("paysupport", "Help with a payment"),
     BotCommand("language", "Choose your language / Tilni tanlash / Выбрать язык"),
     BotCommand("en", "Switch to English"),
     BotCommand("uz", "O'zbekchaga o'tish"),
@@ -296,26 +304,41 @@ def pack_detail_keyboard(pack_name: str, lang: str) -> InlineKeyboardMarkup:
     )
 
 
-def _explain_sticker_error(exc: Exception, lang: str) -> str:
-    """Turns raw Telegram API errors from set-creation/add calls into
-    something the user can actually act on, instead of a bare exception."""
+def _sticker_error_key(exc: Exception) -> tuple:
+    """Which explanation a raw Telegram error from set-creation/add calls
+    gets, as (i18n key, fields)."""
     if isinstance(exc, TimedOut):
         # Not a rejection -- Telegram (or a local Bot API server) just
         # didn't confirm in time, most often on a slow connection uploading
         # a converted video sticker. The upload may well have gone through
         # anyway, so don't call it "rejected" -- that's actively misleading.
-        return i18n.t(lang, "err_timed_out")
+        return "err_timed_out", {}
     msg = str(exc)
     lower = msg.lower()
     if "invalid sticker set name" in lower or "sticker_set_name_invalid" in lower:
-        return i18n.t(lang, "err_invalid_name")
+        return "err_invalid_name", {}
     if "name is already occupied" in lower or "sticker_set_name_occupied" in lower:
-        return i18n.t(lang, "err_name_occupied")
+        return "err_name_occupied", {}
     if "stickers_too_much" in lower:
-        return i18n.t(lang, "err_too_many_stickers")
+        return "err_too_many_stickers", {}
     if "png" in lower and "type" in lower or "webp" in lower and "type" in lower:
-        return i18n.t(lang, "err_bad_format")
-    return i18n.t(lang, "err_generic", msg=msg)
+        return "err_bad_format", {}
+    return "err_generic", {"msg": msg}
+
+
+def _explain_sticker_error(exc: Exception, lang: str) -> str:
+    """Turns raw Telegram API errors from set-creation/add calls into
+    something the user can actually act on, instead of a bare exception."""
+    key, fields = _sticker_error_key(exc)
+    return i18n.t(lang, key, **fields)
+
+
+def _sticker_error_note(exc: Exception, lang: str) -> str:
+    """The status note a failed sticker leaves: what went wrong, what to do
+    next, and its problem code last, where the Report button looks for it."""
+    key, _ = _sticker_error_key(exc)
+    return (_explain_sticker_error(exc, lang) + "\n" + i18n.t(lang, "last_attempt_failed")
+            + problems.code_line(problems.STICKER_ERRORS[key]))
 
 
 def _status_text(context: ContextTypes.DEFAULT_TYPE, lang: str, note: str = "") -> str:
@@ -663,6 +686,9 @@ async def _apply_language(update: Update, context: ContextTypes.DEFAULT_TYPE, la
         await _end_status(context, i18n.t(lang, "cancelled_status_note"))
     context.user_data.clear()
     context.user_data["lang"] = lang
+    # The menu follows the choice too -- Telegram otherwise shows it in the
+    # language of the phone. After the clear, so the signature survives it.
+    await refresh_chat_menu(context, update.effective_user.id, lang)
     return await _continue_start(update, context, lang, pending)
 
 
@@ -1282,7 +1308,7 @@ async def receive_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
         record_error(exc)
         await _refresh_status(
             context, lang,
-            _explain_sticker_error(exc, lang) + "\n" + i18n.t(lang, "last_attempt_failed"),
+            _sticker_error_note(exc, lang),
         )
 
     return EDITING
@@ -1362,7 +1388,7 @@ async def receive_video_media(update: Update, context: ContextTypes.DEFAULT_TYPE
         record_error(exc)
         await _refresh_status(
             context, lang,
-            _explain_sticker_error(exc, lang) + "\n" + i18n.t(lang, "last_attempt_failed"),
+            _sticker_error_note(exc, lang),
         )
 
     return EDITING
@@ -1408,7 +1434,7 @@ async def import_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         stickers = await fetch_importable_stickers(context.bot, pack_source, lang)
     except PackImportError as exc:
-        await _refresh_status(context, lang, str(exc))
+        await _refresh_status(context, lang, str(exc) + problems.code_line("ST-IMPORT"))
         return EDITING
 
     added, skipped, failed = 0, 0, 0
@@ -1473,7 +1499,7 @@ async def receive_whatsapp_import(update: Update, context: ContextTypes.DEFAULT_
     try:
         items = await asyncio.to_thread(parse_whatsapp_zip, bytes(raw), lang)
     except PackImportError as exc:
-        await _refresh_status(context, lang, str(exc))
+        await _refresh_status(context, lang, str(exc) + problems.code_line("ST-IMPORT"))
         return EDITING
 
     added, failed = 0, 0
@@ -1735,6 +1761,7 @@ def main():
     # asks lifecycle whether persistence actually came up.
     lifecycle.install(app, BOT_NAME)
     app.add_error_handler(error_handler)
+    attach_problem_reports(app)
     # ---- the handlers that run before everything else ----
     # ONE GROUP EACH, and that is the whole point. python-telegram-bot runs
     # at most ONE handler per group: the first whose filter matches wins and
@@ -1840,6 +1867,8 @@ def main():
     # finish whatever they were doing first. ----
     app.add_handler(CommandHandler("privacy", privacy_command))
     app.add_handler(CommandHandler("terms", terms_command))
+    app.add_handler(CommandHandler("paysupport", paysupport_command))
+    app.add_handler(CallbackQueryHandler(problem_report_callback, pattern=r"^rpt"))
     app.add_handler(CommandHandler("deletemydata", delete_my_data_command))
     app.add_handler(CallbackQueryHandler(delete_my_data_chosen, pattern="^" + ERASE_PREFIX))
     app.add_handler(CommandHandler("mypacks", mypacks_command))
@@ -1869,6 +1898,7 @@ def main():
 
     # ---- donations (Telegram Stars) -- this bot's only Stars usage, so these
     # register directly with no payload-prefix branching needed ----
+    app.add_handler(CommandHandler("balance", balance_command))
     app.add_handler(CommandHandler("donate", donate_command))
     app.add_handler(CallbackQueryHandler(donate_amount_chosen, pattern="^donate:"))
     app.add_handler(CallbackQueryHandler(donate_fiat_amount_chosen, pattern="^donatefiat:"))
@@ -1881,7 +1911,7 @@ def main():
     app.add_handler(MessageHandler(filters.COMMAND, unknown_command))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, unrecognized_message))
 
-    # ParentBot's link: heartbeats, crash/donation events, and the queue it
+    # ManagerBot's link: heartbeats, crash/donation events, and the queue it
     # uses to run this bot's owner-only commands remotely. Never raises --
     # with no shared database reachable the bot just runs on its own.
     family_link.attach(app, BOT_NAME, "StickerBot", START_TIME)
